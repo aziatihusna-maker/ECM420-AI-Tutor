@@ -1,0 +1,271 @@
+
+COURSE OUTLINES
+
+
+
+
+
+FACULTY OF ELECTRICAL ENGINEERING
+UNIVERSITI TEKNOLOGI MARA
+SHAH ALAM
+
+
+PROGRAMME	
+Bachelor of Electrical Engineering with Honours (CEEE223 / EE223)
+
+COURSE	
+Electromagnetic Theory (ECM420)
+ 
+CREDIT HOUR	3
+SEMESTER	March – July 2026
+
+
+   SYNOPSIS:
+
+This course introduces the basic electromagnetic theory. It comprises of a study of fundamental principles that govern the static and time-varying electric and magnetic fields.
+
+
+   COURSE OUTCOMES (CO):
+
+At the end of this course, the students should be able to: 
+CO1	Apply the fundamental concepts of electrostatic field using Coulomb’s law and Gauss’s law.
+CO2	Apply the fundamental concepts of magnetostatic field using Biot Savart’s law and Ampere’s circuital law.
+CO3	Analyse the time-varying electromagnetic fields using Faraday’s law and the electromagnetic wave propagation behaviour.
+
+ PROGRAM OUTCOMES (PO):
+	   CO - PO MATRIX:
+
+PO1	Apply knowledge of mathematics, science and engineering fundamentals to the solution of complex electrical engineering problems.
+PO2	Identify, formulate, research literature and analyse complex electrical engineering problems reaching substantiated conclusions.
+
+	
+	PO1	PO2
+CO1	✓	
+CO2	✓	
+CO3		✓
+
+
+
+SUSTAINABLE DEVELOPMENT GOALS (SDGs)
+SDG7	Affordable and clean energy
+  
+ 
+A.D.A.B MODEL DELIVERY	VALUE & ELEMENT CODE
+Digest
+	Give students access to content	B1	Nilai bertuhan
+Synthesis	Get students to put info/facts together, relate and make conclusion. 	B3	Nilai berbuat kebaikan
+   
+
+     COURSE EVALUATION:
+
+Course Work
+
+1.	Test 1
+2.	Assignment 1
+3.	Assignment 2
+
+Total Course Work	Percentage
+
+20%
+15%
+15%
+
+50%
+
+Final Examination	50%
+Total Marks	100%
+
+
+
+
+RECOMMENDED TEXT
+
+1.	Matthew N. O. Sadiku & Sudarshan Nelatury, Elements of Electromagnetics, 7th, Oxford University Press Inc., 2021
+
+REFERENCES
+
+1.	William H. Hyat, Engineeering Electromagnetics, 9th edition, Mc Graw Hill Higher Education, 2019.
+2.	Nathan Ida, Engineering Electromagnetics, 4th edition, Springer, 2020.
+3.	Guy A. E. Vandenbosch, Somsak Akatimagool, Fundamentals of Electromagnetics with MATLAB, SCITUS Academics LLC, 2019.
+4.	S. Balaji, Electromagnetics Made Easy, 1st edition, Springer Singapore, 2020.
+5.	Ahmad Shahid Khan, Saurabh Kumar Mukerji, Electromagnetic Fields Theory and Applications, 1st edition, CRC Press, 2021.
+6.	Fawwaz T. Ulaby, Umberto Ravaioli, Electromagnetics for Engineers: Foundations, Applications, and Computational Methods,2nd edition, Pearson Education, 2020.
+7.	Riad, Sedki M., and Iman M. Salama, Electromagnetic Fields and Waves: Fundamentals of Engineering. 1st edition, New York: McGraw-Hill Education, 2020.
+
+
+LECTURER
+
+No.	Name	Group	Contact No.	Room No.
+1	Dr. Robi’atun Adayiah Awang 
+(Course Coordinator)	CEEE2234C 
+& 
+EE2234B	013-3322726	T2-A12- 4A
+2	En. Mohd Nor Md Tan	CEEE2234D 
+&
+EE2234A	012-3757856	T2-A12-10C
+3	Dr. Aziati Husna Awang	CEEE2234B
+ & 
+EE2234R1	019-6656624	T2-A15-5C
+4	PM Dr. Muhammad Farid Abdul Khalid
+	EE2224B	014-3362697
+	T2-A12- 11C
+
+5	Prof. Ir. Dr. Nur Emileen Abdul Rashid 	EE2224A 	019-3996530	T2-A12-6A
+6	Ir. Dr. Nor Ayu Nor Zalina Zakaria	CEEE2224A	011-11221158	T2-A12-7A / MRI
+
+7	PM. Dr. Nani Fadzlina Naim            	CEEE2234A
+	018-9682956	T2-A15-11A
+8	Ts. Dr. Siti Amalina Binti Enche Ab Rahim	CEEE2224B
+	019-6656041	T2-A12-12A / MRI
+
+ 
+LESSON PLAN:
+
+
+WEEK/
+DATE	CHAPTER/
+TOPIC	CO	PO	A.D.A.B MODEL/ VALUE/SDG	ASSESSMENT
+
+1
+
+30 Mar – 3
+Apr 2026	Coordinate Systems & Transformation
+-	Cartesian, Cylindrical and Spherical Coordinates
+-	Differential Length, Area and volume	1	1	
+A.D.A.B
+Digest – B1	-
+2
+
+6 – 10
+Apr 2026	Vector Calculus
+-	Line, Surface and Volume Integral
+-	Del Operator, Gradient of scalar, Divergence, Curl and Laplacian
+
+Electrostatics Fields
+-	Coulomb’s Law and Field Intensity	1	1	
+A.D.A.B
+Digest – B1	-
+3
+
+13 – 17
+Apr 2026	Electrostatics Fields
+-	Coulomb’s Law and Field Intensity
+-	Gauss’s Law – Maxwell’s Equation	1	1	
+A.D.A.B
+Digest – B1	
+
+-
+
+
+
+
+
+4
+
+20 – 24
+Apr 2026	-	Gauss’s Law – (Cont’d)
+-	Relationship between E and V– Maxwell’s Equation	1	1	
+A.D.A.B
+Digest – B1	-
+5
+
+27 Apr – 1 May 2026	Electrostatic Boundary-Value Problems 
+-	Poisson’s and Laplace’s Equation
+-	Capacitance	1	1	
+A.D.A.B
+Digest – B1	-
+6
+
+4 – 8 
+May 2026	Magnetostatic Fields
+Biot-Savart’s Law	2	1	
+A.D.A.B
+Digest – B1	ASSIGNMENT 1
+(Gauss’s Law)
+TEST 1 (11 – 15 MAY 2026)
+8
+
+18 – 22 
+May 2026	-	Ampere’s Law 	2	1	
+A.D.A.B
+Digest – B1	-
+MID-SEM BREAK (25 MAY – 2 JUNE 2026)
+9
+
+3 – 5 
+June 2026	-	Ampere’s Law (Cont’d)	2	1	
+A.D.A.B
+Digest – B1	-
+
+10
+
+8 – 12 
+June 2026	-	Inductors and Inductances 
+	2	1	
+A.D.A.B
+Digest – B1	-
+11
+
+15 – 19 
+June 2026	
+
+Maxwell’s Equations
+-	Faraday’s Law 
+-	Transformer and Motional Electromotive Forces
+
+
+
+
+
+	3	2	
+A.D.A.B
+Synthesis – B3
+
+SDG7	-
+12
+
+22 – 26 
+June 2026	
+Maxwell’s Equations
+-	Transformer and Motional Electromotive Forces	3	2	
+A.D.A.B
+Synthesis – B3
+
+
+SDG7	-
+
+13
+
+29 June – 3 July 2026	Electromagnetic Wave Propagation
+-	Wave Propagation in Lossy Dielectrics
+-	Planes Waves in Lossless Dielectrics 
+-	Planes Waves in Free Space
+	3	2	
+A.D.A.B
+Synthesis – B3
+
+	-
+14
+
+6 – 10 
+July 2026	Electromagnetic Wave Propagation
+-	Planes Waves in Good Conductors
+-	Power and Poynting Vector	3	2	
+A.D.A.B
+Synthesis – B3
+
+	ASSIGNMENT 2
+(EMW Propagation)
+
+REVISION WEEK (13 – 19 JULY 2026)
+
+FINAL EXAMINATION (20 JULY – 9 AUGUST 2026)
+
+SEMESTER BREAK (10 AUGUST – 4 OCTOBER 2026)
+
+
+
+
+
+
+
