@@ -72,9 +72,8 @@ def log_to_sheets(conf_level, days, struggle):
     except Exception as e:
         print(f"Database Error: {e}")
 
-# --- UPDATED: PDF GENERATOR FUNCTION ---
+# PDF Generator Function
 def create_pdf(markdown_text):
-    # toc_level=2 prevents heading hierarchy crashes
     pdf = MarkdownPdf(toc_level=2) 
     content = f"# ECM420 Study Plan\n\n{markdown_text}"
     pdf.add_section(Section(content))
@@ -87,7 +86,6 @@ def create_pdf(markdown_text):
     os.remove(temp_filename)
     
     return pdf_bytes
-# ---------------------------------------
 
 # 4. The Action Button & AI Logic
 if st.button("Generate My Sprint Plan 🚀"):
@@ -107,7 +105,7 @@ if st.button("Generate My Sprint Plan 🚀"):
                 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
                 model = genai.GenerativeModel('gemini-2.5-flash')
                 
-                # FIXED: Stricter prompt to prevent bad markdown table formatting and heading jumps
+                # FIXED: Added strict rules blocking LaTeX math formatting so the PDF generator doesn't break!
                 system_prompt = f"""
                 You are an empathetic, expert university professor teaching Electromagnetics Theory (course code ECM420) at UiTM. 
                 A student has come to you for help.
@@ -126,7 +124,11 @@ if st.button("Generate My Sprint Plan 🚀"):
                 2. A structured, day-by-day study schedule spreading out the concepts over {days_remaining} days. Reference the syllabus. IMPORTANT: You MUST format this study schedule strictly as a Markdown table with exactly 5 columns. You MUST include a valid formatting separator row right under the headers (e.g., |---|---|---|---|---|). Paraphrase all concepts to avoid recitation filters.
                 3. A suggested checkpoint question or mini-quiz at the end.
                 
-                Format the rest of the response beautifully using standard Markdown headings. Do not skip heading levels (use ## then ###).
+                CRITICAL FORMATTING RULES FOR PDF COMPATIBILITY:
+                - DO NOT use LaTeX, MathJax, or dollar signs ($ or $$) for equations or Greek letters under ANY circumstances. The PDF converter will crash.
+                - Use plain English words for Greek letters (e.g., type "rho", "theta", "phi", "epsilon").
+                - Use plain keyboard text for formulas (e.g., type "x = r * cos(theta)").
+                - Keep text formatting simple. Use standard **bold** and *italics* only. Do not skip heading levels (use ## then ###).
                 """
                 
                 response = model.generate_content(
@@ -146,7 +148,6 @@ if st.button("Generate My Sprint Plan 🚀"):
                     # --- PDF DOWNLOAD BUTTON ---
                     st.markdown("---")
                     
-                    # Failsafe: Clean up AI table separator hallucinations before passing to PDF maker
                     clean_md = response.text.replace("\n||\n", "\n|---|---|---|---|---|\n")
                     clean_md = clean_md.replace("\n| |\n", "\n|---|---|---|---|---|\n")
                     
