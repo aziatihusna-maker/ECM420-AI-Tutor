@@ -103,7 +103,7 @@ if st.button("Generate My Sprint Plan 🚀"):
                 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
                 model = genai.GenerativeModel('gemini-2.5-flash')
                 
-                # UPDATED: The prompt now strictly commands the AI to use a Markdown Table for the schedule!
+                # The prompt now strictly commands the AI to use a Markdown Table for the schedule!
                 system_prompt = f"""
                 You are an empathetic, expert university professor teaching Electromagnetics Theory (course code ECM420) at UiTM. 
                 A student has come to you for help.
@@ -137,4 +137,22 @@ if st.button("Generate My Sprint Plan 🚀"):
                 
                 if response.candidates and response.candidates[0].content.parts:
                     st.success("UiTM-Aligned Plan Generated Successfully!")
-                    st.
+                    st.markdown(response.text)
+                    
+                    # --- PDF DOWNLOAD BUTTON ---
+                    st.markdown("---")
+                    pdf_bytes = create_pdf(response.text)
+                    st.download_button(
+                        label="📥 Download Plan as PDF",
+                        data=pdf_bytes,
+                        file_name="ECM420_Study_Plan.pdf",
+                        mime="application/pdf"
+                    )
+                    # ---------------------------
+                    
+                else:
+                    block_reason = response.candidates[0].finish_reason if response.candidates else "UNKNOWN_ERROR"
+                    st.error(f"⚠️ The AI blocked the response. (Error Code: {block_reason}). Try rephrasing your struggle or shortening the syllabus.")
+                
+            except Exception as e:
+                st.error(f"An error occurred while contacting the AI: {e}")
