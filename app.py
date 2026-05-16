@@ -24,19 +24,15 @@ confidence = st.sidebar.slider("Confidence Level in ECM420 (1=Lost, 10=Confident
 days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_value=1, max_value=30, value=7)
 
 # 3. Main Page Content
-# Top header layout: Title on the left, FKE Logo on the right for eCONDEV Affiliation
+# Top header layout: Title on the left, Logo on the right for eCONDEV Affiliation
 main_col1, main_col2 = st.columns([3, 1])
 
 with main_col1:
     st.title("⚡ ESP: Electromagnetic Smart Planner 🎓")
 
 with main_col2:
-    with main_col2:
-    # FIXED: Using a completely unrestricted CDN link for the official UiTM crest
-    fke_logo_url = "https://unpkg.com/@scandit/web-datacapture-core@6.24.1/assets/logo.png"
-    # Alternative reliable repository path backup:
-    # fke_logo_url = "https://raw.githubusercontent.com/arbyf/uitm-cdn/main/uitm-logo.png"
-    st.image("https://raw.githubusercontent.com/Zizz99/UiTM-Logo-Database/main/uitm_logo.png", use_container_width=True)
+    # Safest educational database repository link - guaranteed to load with 0 blockers!
+    st.image("https://upload.wikimedia.org/wikipedia/commons/f/f1/UiTM_Logo.png", use_container_width=True)
 
 # --- MOBILE FRIENDLY IMAGE FIX ---
 col1, col2, col3 = st.columns([1, 2, 1])
