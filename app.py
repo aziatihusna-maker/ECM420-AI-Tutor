@@ -12,7 +12,7 @@ st.set_page_config(page_title="EMT-Predict & Pace", page_icon="⚡", layout="cen
 
 # 2. Sidebar Layout
 st.sidebar.title("⚡ EMT-Predict & Pace")
-st.sidebar.write("**UiTM ECM420 Adaptive Study Planner**")
+st.sidebar.write("**UiTM ECM420 Adaptive Study Planner & Tutor**")
 st.sidebar.markdown("---")
 
 st.sidebar.subheader("Student Profile")
@@ -24,7 +24,7 @@ days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_v
 # ---------------------------------------------------------
 
 # 3. Main Page Content
-st.title("Welcome to your ECM420 AI Tutor 🎓")
+st.title("Welcome to your ECM420 AI Planner 🎓")
 
 # --- MOBILE FRIENDLY IMAGE FIX ---
 # We use columns to keep the image small on laptops, but automatically shrink on phones!
