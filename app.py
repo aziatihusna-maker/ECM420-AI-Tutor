@@ -32,7 +32,17 @@ with main_col1:
 
 with main_col2:
     # Safest educational database repository link - guaranteed to load with 0 blockers!
-    st.image("https://upload.wikimedia.org/wikipedia/commons/f/f1/UiTM_Logo.png", use_container_width=True)
+    # 3. Main Page Content
+# Top header layout: Title on the left, Logo on the right for eCONDEV Affiliation
+main_col1, main_col2 = st.columns([3, 1])
+
+with main_col1:
+    st.title("⚡ ESP: Electromagnetic Smart Planner 🎓")
+
+with main_col2:
+    # High-reliability direct link from an open academic server domain
+    uitm_logo_url = "https://aims.uitm.edu.my/images/uitm_logo.png"
+    st.image(uitm_logo_url, use_container_width=True)
 
 # --- MOBILE FRIENDLY IMAGE FIX ---
 col1, col2, col3 = st.columns([1, 2, 1])
