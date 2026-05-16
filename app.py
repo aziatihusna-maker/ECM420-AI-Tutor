@@ -5,9 +5,33 @@ import json
 import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime
+from fpdf import FPDF
 
 # 1. Page Configuration
 st.set_page_config(page_title="EMT-Predict & Pace", page_icon="⚡", layout="wide")
+
+# --- NEW: DREAMY COLOURFUL THEME ---
+# This CSS injects a soft, dreamy gradient background and styles the boxes!
+st.markdown("""
+<style>
+.stApp {
+    background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+}
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #f3e7e9 0%, #e3eeff 100%);
+}
+.stTextArea textarea {
+    background-color: rgba(255, 255, 255, 0.8) !important;
+    border-radius: 10px;
+}
+div[data-testid="stInfo"] {
+    background-color: rgba(255, 255, 255, 0.6) !important;
+    border-radius: 10px;
+    border: none;
+}
+</style>
+""", unsafe_allow_html=True)
+# -----------------------------------
 
 # 2. Sidebar Layout
 st.sidebar.title("⚡ EMT-Predict & Pace")
@@ -20,6 +44,11 @@ days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_v
 
 # 3. Main Page Content
 st.title("Welcome to your ECM420 AI Tutor 🎓")
+
+# --- NEW: INSPIRING IMAGE ---
+# Adds a beautiful, dreamy abstract technology image from Unsplash
+st.image("https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=2000&auto=format&fit=crop", use_container_width=True)
+# ----------------------------
 
 st.info("""
 **👉 HOW TO USE YOUR AI TUTOR:**
@@ -35,30 +64,29 @@ student_struggle = st.text_area(
     height=150
 )
 
-# --- NEW: Database Logging Function ---
+# Database Logging Function
 def log_to_sheets(conf_level, days, struggle):
     try:
-        # Load the secret JSON we pasted in Streamlit
         creds_dict = json.loads(st.secrets["GOOGLE_CREDENTIALS_JSON"])
-        scopes = [
-            "https://www.googleapis.com/auth/spreadsheets",
-            "https://www.googleapis.com/auth/drive"
-        ]
+        scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
         creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
         client = gspread.authorize(creds)
-        
-        # Open your specific Google Sheet (Ensure the name matches exactly!)
         sheet = client.open("ECM420_Database").sheet1
-        
-        # Get the current time
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        # Add a new row to the bottom of the sheet
         sheet.append_row([current_time, conf_level, days, struggle])
     except Exception as e:
-        # If it fails, print error to server logs but do not disrupt the student's app experience
         print(f"Database Error: {e}")
-# --------------------------------------
+
+# --- NEW: PDF GENERATOR FUNCTION ---
+def create_pdf(plan_text):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Helvetica", size=11)
+    # Replaces emojis and special characters so the PDF doesn't crash
+    safe_text = plan_text.encode('latin-1', 'replace').decode('latin-1')
+    pdf.multi_cell(0, 7, text=safe_text)
+    return bytes(pdf.output())
+# -----------------------------------
 
 # 4. The Action Button & AI Logic
 if st.button("Generate My Sprint Plan 🚀"):
@@ -67,7 +95,6 @@ if st.button("Generate My Sprint Plan 🚀"):
     else:
         with st.spinner("Analyzing your learning gap and checking the ECM420 syllabus..."):
             
-            # -> Save to database in the background! <-
             log_to_sheets(confidence, days_remaining, student_struggle)
             
             try:
@@ -93,9 +120,9 @@ if st.button("Generate My Sprint Plan 🚀"):
                 Their specific struggle: "{student_struggle}"
                 
                 Please provide:
-                1. A brief, encouraging diagnosis validating their struggle (ECM420 is tough!).
-                2. A structured, day-by-day study schedule spreading out the concepts over {days_remaining} days. Ensure your advice references topics from the syllabus. IMPORTANT: Do NOT quote the syllabus verbatim. Paraphrase all concepts in your own words to avoid recitation filters.
-                3. A suggested checkpoint question or mini-quiz at the end to test their understanding.
+                1. A brief, encouraging diagnosis validating their struggle.
+                2. A structured, day-by-day study schedule spreading out the concepts over {days_remaining} days. Reference the syllabus. IMPORTANT: Paraphrase all concepts to avoid recitation filters.
+                3. A suggested checkpoint question or mini-quiz at the end.
                 
                 Format the response beautifully using Markdown headings, bold text, and bullet points.
                 """
@@ -114,14 +141,16 @@ if st.button("Generate My Sprint Plan 🚀"):
                     st.success("UiTM-Aligned Plan Generated Successfully!")
                     st.markdown(response.text)
                     
+                    # --- PDF DOWNLOAD BUTTON ---
                     st.markdown("---")
+                    pdf_bytes = create_pdf(response.text)
                     st.download_button(
-                        label="📥 Download Your Study Plan",
-                        data=response.text,
-                        file_name="ECM420_Study_Plan.txt",
-                        mime="text/plain"
+                        label="📥 Download Plan as PDF",
+                        data=pdf_bytes,
+                        file_name="ECM420_Study_Plan.pdf",
+                        mime="application/pdf"
                     )
-                    st.caption("💡 *Tip: You can also right-click anywhere on this page and select 'Print' to save it as a PDF!*")
+                    # ---------------------------
                     
                 else:
                     block_reason = response.candidates[0].finish_reason if response.candidates else "UNKNOWN_ERROR"
