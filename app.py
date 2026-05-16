@@ -25,7 +25,7 @@ days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_v
 
 # 3. Main Page Content
 # Top header layout: Title on the left, Logo on the right for eCONDEV Affiliation
-main_col1, main_col2 = st.columns([3, 1])
+main_col1, main_col2 = st.columns([2, 1])
 
 with main_col1:
     st.title("⚡ ESP: Electromagnetic Smart Planner 🎓")
