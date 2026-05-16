@@ -16,10 +16,23 @@ days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_v
 
 # 3. Main Page Content
 st.title("Welcome to your ECM420 AI Tutor 🎓")
+
+# --- NEW WOW FACTOR: ABOUT EXPANDER ---
+with st.expander("ℹ️ About this App & How to Use It"):
+    st.markdown("""
+    **Welcome to EMT-Predict & Pace!** This Intelligent Tutoring System was developed by **Dr. Aziati Husna Awang** for UiTM engineering students tackling Electromagnetics Theory (ECM420). It acts as your personal 24/7 AI teaching assistant, cross-referencing your exact learning hurdles with the official UiTM syllabus to keep you on track.
+    
+    **How to use this tool:**
+    1. 👈 **Set your profile:** Use the sidebar on the left to set your current confidence level and the days remaining until your assessment.
+    2. ✍️ **Describe your struggle:** In the text box below, be specific! For example, instead of saying *"I don't get chapter 2,"* try *"I am confused by how to apply Gauss's Law to a cylindrical surface."*
+    3. 🚀 **Generate:** Click the button to receive your customized, bite-sized study sprint and checkpoint questions!
+    """)
+# ---------------------------------------
+
 st.write("Having trouble with Electromagnetics Theory? Tell me exactly what is confusing you, and I will generate a custom, day-by-day sprint schedule mapped directly to your UiTM syllabus.")
 
 student_struggle = st.text_area(
-    "Describe your struggle (e.g., 'I don't understand boundary conditions between two lossy dielectrics'):",
+    "Describe your struggle:",
     height=150
 )
 
@@ -58,7 +71,7 @@ if st.button("Generate My Sprint Plan 🚀"):
                 2. A structured, day-by-day study schedule spreading out the concepts over {days_remaining} days. Ensure your advice references topics from the syllabus. IMPORTANT: Do NOT quote the syllabus verbatim. Paraphrase all concepts in your own words to avoid recitation filters.
                 3. A suggested checkpoint question or mini-quiz at the end to test their understanding.
                 
-                Format the response beautifully using Markdown headings, bold text, and bullet points.
+                Format the response beautifully using Markdown headings, bold text, and bullet points. Use LaTeX formatting only if you need to output complex physics equations (using $ and $$ delimiters).
                 """
                 
                 response = model.generate_content(
