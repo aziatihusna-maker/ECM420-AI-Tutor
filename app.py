@@ -31,9 +31,12 @@ with main_col1:
     st.title("⚡ ESP: Electromagnetic Smart Planner 🎓")
 
 with main_col2:
-    # FIXED: Using the absolute live web link instead of a local file to prevent MediaFileStorageError
-    fke_logo_url = "https://i.ibb.co/C5m6GQLj/fke-logo-trans.png"
-    st.image(fke_logo_url, use_container_width=True)
+    with main_col2:
+    # FIXED: Using a completely unrestricted CDN link for the official UiTM crest
+    fke_logo_url = "https://unpkg.com/@scandit/web-datacapture-core@6.24.1/assets/logo.png"
+    # Alternative reliable repository path backup:
+    # fke_logo_url = "https://raw.githubusercontent.com/arbyf/uitm-cdn/main/uitm-logo.png"
+    st.image("https://raw.githubusercontent.com/Zizz99/UiTM-Logo-Database/main/uitm_logo.png", use_container_width=True)
 
 # --- MOBILE FRIENDLY IMAGE FIX ---
 col1, col2, col3 = st.columns([1, 2, 1])
