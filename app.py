@@ -11,8 +11,9 @@ from fpdf import FPDF
 st.set_page_config(page_title="EMT-Predict & Pace", page_icon="⚡", layout="centered")
 
 # 2. Sidebar Layout
-st.sidebar.title("⚡ EMT-Predict & Pace")
-st.sidebar.write("**UiTM ECM420 Adaptive Study Planner & Tutor**")
+st.sidebar.title("⚡ ESP")
+st.sidebar.write("**Electromagnetic Smart Planner**")
+st.sidebar.write("UiTM ECM420 Adaptive Study Planner & Tutor")
 st.sidebar.markdown("---")
 
 st.sidebar.subheader("Student Profile")
