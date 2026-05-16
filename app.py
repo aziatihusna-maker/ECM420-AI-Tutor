@@ -10,29 +10,6 @@ from fpdf import FPDF
 # 1. Page Configuration
 st.set_page_config(page_title="EMT-Predict & Pace", page_icon="⚡", layout="wide")
 
-# --- NEW: DREAMY COLOURFUL THEME ---
-# This CSS injects a soft, dreamy gradient background and styles the boxes!
-st.markdown("""
-<style>
-.stApp {
-    background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
-}
-[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #f3e7e9 0%, #e3eeff 100%);
-}
-.stTextArea textarea {
-    background-color: rgba(255, 255, 255, 0.8) !important;
-    border-radius: 10px;
-}
-div[data-testid="stInfo"] {
-    background-color: rgba(255, 255, 255, 0.6) !important;
-    border-radius: 10px;
-    border: none;
-}
-</style>
-""", unsafe_allow_html=True)
-# -----------------------------------
-
 # 2. Sidebar Layout
 st.sidebar.title("⚡ EMT-Predict & Pace")
 st.sidebar.write("**UiTM ECM420 Adaptive Study Planner**")
