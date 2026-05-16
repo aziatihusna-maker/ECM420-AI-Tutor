@@ -24,19 +24,13 @@ confidence = st.sidebar.slider("Confidence Level in ECM420 (1=Lost, 10=Confident
 days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_value=1, max_value=30, value=7)
 
 # 3. Main Page Content
-# Optimized responsive header layout: Custom font sizing and middle vertical alignment
-main_col1, main_col2 = st.columns([2.5, 1])
+# Layout: Gives the title plenty of room (3 parts) and the logo 1 part, preventing weird wrapping
+main_col1, main_col2 = st.columns([3, 1])
 
 with main_col1:
-    # Uses clean HTML to make the title slightly smaller and perfectly middle-aligned
+    # Slightly smaller, clean header with a bit of top padding to align with the center of the logo
     st.markdown(
-        """
-        <div style='display: flex; align-items: center; height: 100%; padding-top: 15px;'>
-            <h2 style='margin: 0; font-size: 28px; font-weight: 700; line-height: 1.3;'>
-                ⚡ ESP: Electromagnetic Smart Planner 🎓
-            </h2>
-        </div>
-        """, 
+        "<h3 style='padding-top: 15px; margin: 0;'>⚡ ESP: Electromagnetic Smart Planner 🎓</h3>", 
         unsafe_allow_html=True
     )
 
@@ -47,17 +41,12 @@ with main_col2:
     else:
         st.image("https://aims.uitm.edu.my/images/uitm_logo.png", use_container_width=True)
 
-# --- MOBILE FRIENDLY IMAGE FIX ---
+# --- SINGLE MOBILE FRIENDLY IMAGE ---
+# Ensures only one image appears on the screen
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.image("https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=600&auto=format&fit=crop", use_container_width=True, caption="Calm Minds, Bright Futures")
-# ---------------------------------
-
-# --- MOBILE FRIENDLY IMAGE FIX ---
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    st.image("https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=600&auto=format&fit=crop", use_container_width=True, caption="Calm Minds, Bright Futures")
-# ---------------------------------
+# ------------------------------------
 
 st.info("""
 **👉 HOW TO USE YOUR AI TUTOR:**
@@ -86,7 +75,7 @@ def log_to_sheets(conf_level, days, struggle):
     except Exception as e:
         print(f"Database Error: {e}")
 
-# --- NEW: PDF GENERATOR FUNCTION ---
+# PDF Generator Function
 def create_pdf(plan_text):
     pdf = FPDF()
     pdf.add_page()
@@ -95,7 +84,6 @@ def create_pdf(plan_text):
     safe_text = plan_text.encode('latin-1', 'replace').decode('latin-1')
     pdf.multi_cell(0, 7, text=safe_text)
     return bytes(pdf.output())
-# -----------------------------------
 
 # 4. The Action Button & AI Logic
 if st.button("Generate My Sprint Plan 🚀"):
