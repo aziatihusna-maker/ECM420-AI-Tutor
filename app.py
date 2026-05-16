@@ -24,7 +24,7 @@ days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_v
 # ---------------------------------------------------------
 
 # 3. Main Page Content
-st.title("Welcome to your ECM420 AI Planner 🎓")
+st.title("🎓 ECM420 AI Tutor: Adaptive Electromagnetics Study Planner")
 
 # --- MOBILE FRIENDLY IMAGE FIX ---
 # We use columns to keep the image small on laptops, but automatically shrink on phones!
