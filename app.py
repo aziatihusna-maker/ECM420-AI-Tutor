@@ -105,7 +105,6 @@ if st.button("Generate My Sprint Plan 🚀"):
                 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
                 model = genai.GenerativeModel('gemini-2.5-flash')
                 
-                # FIXED: Added strict rules blocking LaTeX math formatting so the PDF generator doesn't break!
                 system_prompt = f"""
                 You are an empathetic, expert university professor teaching Electromagnetics Theory (course code ECM420) at UiTM. 
                 A student has come to you for help.
@@ -167,5 +166,11 @@ if st.button("Generate My Sprint Plan 🚀"):
                     block_reason = response.candidates[0].finish_reason if response.candidates else "UNKNOWN_ERROR"
                     st.error(f"⚠️ The AI blocked the response. (Error Code: {block_reason}). Try rephrasing your struggle or shortening the syllabus.")
                 
+            # --- NEW STUDENT-FRIENDLY ERROR CATCHER ---
             except Exception as e:
-                st.error(f"An error occurred while contacting the AI: {e}")
+                error_msg = str(e)
+                if "429" in error_msg or "quota" in error_msg.lower():
+                    st.warning("⏳ The AI tutor is currently helping a lot of students at once! Please take a deep breath, wait a minute or two, and click Generate again.")
+                else:
+                    st.error(f"An error occurred while contacting the AI: {e}")
+            # ------------------------------------------
