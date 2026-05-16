@@ -12,8 +12,8 @@ st.set_page_config(page_title="EMT-Predict & Pace", page_icon="⚡", layout="cen
 
 # 2. Sidebar Layout
 # This looks for the logo.png file in your GitHub repository and displays it at the top of the sidebar
-if os.path.exists("logo.png"):
-    st.sidebar.image("logo.png", use_container_width=True)
+if os.path.exists("Logo.png"):
+    st.sidebar.image("Logo.png", use_container_width=True)
 
 st.sidebar.title("⚡ ESP")
 st.sidebar.write("**Electromagnetic Smart Planner**")
