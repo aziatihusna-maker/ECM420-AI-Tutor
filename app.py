@@ -42,12 +42,16 @@ st.sidebar.subheader("Student Profile")
 confidence = st.sidebar.slider("Confidence Level in ECM420 (1=Lost, 10=Confident)", 1, 10, 5)
 days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_value=1, max_value=30, value=7)
 
+# ---------------------------------------------------------
+# Step: REPLACE ONLY SECTION 3 IN YOUR app.py ON GITHUB
+# ---------------------------------------------------------
+
 # 3. Main Page Content
 st.title("Welcome to your ECM420 AI Tutor 🎓")
 
-# --- NEW: INSPIRING IMAGE ---
-# Adds a beautiful, dreamy abstract technology image from Unsplash
-st.image("https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=2000&auto=format&fit=crop", use_container_width=True)
+# --- CALMER, SMALLER IMAGE ---
+# We use a minimalist image and force a smaller, fixed width (400px)
+st.image("https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=600&auto=format&fit=crop", width=400, caption="Calm Minds, Bright Futures")
 # ----------------------------
 
 st.info("""
