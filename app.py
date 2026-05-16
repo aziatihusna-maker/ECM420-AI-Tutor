@@ -24,20 +24,34 @@ confidence = st.sidebar.slider("Confidence Level in ECM420 (1=Lost, 10=Confident
 days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_value=1, max_value=30, value=7)
 
 # 3. Main Page Content
-# Top header layout: Title on the left, Logo on the right for eCONDEV Affiliation
-main_col1, main_col2 = st.columns([2, 1])
+# Optimized responsive header layout: Custom font sizing and middle vertical alignment
+main_col1, main_col2 = st.columns([2.5, 1])
 
 with main_col1:
-    st.title("⚡ ESP: Electromagnetic Smart Planner 🎓")
+    # Uses clean HTML to make the title slightly smaller and perfectly middle-aligned
+    st.markdown(
+        """
+        <div style='display: flex; align-items: center; height: 100%; padding-top: 15px;'>
+            <h2 style='margin: 0; font-size: 28px; font-weight: 700; line-height: 1.3;'>
+                ⚡ ESP: Electromagnetic Smart Planner 🎓
+            </h2>
+        </div>
+        """, 
+        unsafe_allow_html=True
+    )
 
 with main_col2:
-    # FIXED: Code reads your exact uploaded file string including the space and extension
     fke_filename = "FKE logo.jpg"
     if os.path.exists(fke_filename):
         st.image(fke_filename, use_container_width=True)
     else:
-        # High-reliability automatic fallback link if the file path is missed by GitHub cache
         st.image("https://aims.uitm.edu.my/images/uitm_logo.png", use_container_width=True)
+
+# --- MOBILE FRIENDLY IMAGE FIX ---
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image("https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=600&auto=format&fit=crop", use_container_width=True, caption="Calm Minds, Bright Futures")
+# ---------------------------------
 
 # --- MOBILE FRIENDLY IMAGE FIX ---
 col1, col2, col3 = st.columns([1, 2, 1])
