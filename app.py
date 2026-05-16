@@ -24,13 +24,13 @@ confidence = st.sidebar.slider("Confidence Level in ECM420 (1=Lost, 10=Confident
 days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_value=1, max_value=30, value=7)
 
 # 3. Main Page Content
-# Layout: Gives the title plenty of room (3 parts) and the logo 1 part, preventing weird wrapping
-main_col1, main_col2 = st.columns([3, 1])
+# Added vertical_alignment="center" so the text and logo lock onto the exact same level!
+main_col1, main_col2 = st.columns([3, 1], vertical_alignment="center")
 
 with main_col1:
-    # Slightly smaller, clean header with a bit of top padding to align with the center of the logo
+    # Removed the awkward padding so Streamlit can naturally center it
     st.markdown(
-        "<h3 style='padding-top: 15px; margin: 0;'>⚡ ESP: Electromagnetic Smart Planner</h3>", 
+        "<h2 style='margin: 0;'>⚡ ESP: Electromagnetic Smart Planner</h2>", 
         unsafe_allow_html=True
     )
 
