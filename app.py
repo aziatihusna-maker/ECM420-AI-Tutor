@@ -29,7 +29,16 @@ days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_v
 # ---------------------------------------------------------
 
 # 3. Main Page Content
-st.title("🎓 ECM420 AI Tutor: Adaptive Electromagnetics Study Planner")
+# Top header layout: Title on the left, FKE Logo on the right for eCONDEV Affiliation
+main_col1, main_col2 = st.columns([3, 1])
+
+with main_col1:
+    st.title("⚡ ESP: Electromagnetic Smart Planner 🎓")
+
+with main_col2:
+    # Direct official FKE web logo link - loads perfectly and instantly
+    fke_logo_url = "https://fke.uitm.edu.my/images/fke_logo_trans.png"
+    st.image(fke_logo_url, use_container_width=True)
 
 # --- MOBILE FRIENDLY IMAGE FIX ---
 # We use columns to keep the image small on laptops, but automatically shrink on phones!
