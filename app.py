@@ -1,6 +1,10 @@
 import streamlit as st
 import google.generativeai as genai
 import os
+import json
+import gspread
+from google.oauth2.service_account import Credentials
+from datetime import datetime
 
 # 1. Page Configuration
 st.set_page_config(page_title="EMT-Predict & Pace", page_icon="⚡", layout="wide")
@@ -17,14 +21,12 @@ days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_v
 # 3. Main Page Content
 st.title("Welcome to your ECM420 AI Tutor 🎓")
 
-# --- IMPROVED VISIBILITY: Colored Info Box ---
 st.info("""
 **👉 HOW TO USE YOUR AI TUTOR:**
 1. **Set your profile (Left Sidebar):** Adjust your confidence level and the days remaining until your test.
 2. **Describe your struggle:** Be specific! (e.g., *"I don't know how to apply Gauss's Law to a cylindrical surface."*)
 3. **Generate:** Click the button below to get your custom sprint schedule.
 """)
-# ---------------------------------------------
 
 st.write("Having trouble with Electromagnetics Theory? Tell me exactly what is confusing you, and I will generate a custom, day-by-day sprint schedule mapped directly to your UiTM syllabus.")
 
@@ -33,20 +35,47 @@ student_struggle = st.text_area(
     height=150
 )
 
+# --- NEW: Database Logging Function ---
+def log_to_sheets(conf_level, days, struggle):
+    try:
+        # Load the secret JSON we pasted in Streamlit
+        creds_dict = json.loads(st.secrets["GOOGLE_CREDENTIALS_JSON"])
+        scopes = [
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive"
+        ]
+        creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+        client = gspread.authorize(creds)
+        
+        # Open your specific Google Sheet (Ensure the name matches exactly!)
+        sheet = client.open("ECM420_Database").sheet1
+        
+        # Get the current time
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Add a new row to the bottom of the sheet
+        sheet.append_row([current_time, conf_level, days, struggle])
+    except Exception as e:
+        # If it fails, print error to server logs but do not disrupt the student's app experience
+        print(f"Database Error: {e}")
+# --------------------------------------
+
 # 4. The Action Button & AI Logic
 if st.button("Generate My Sprint Plan 🚀"):
     if not student_struggle:
         st.warning("⚠️ Please describe what you are struggling with so I can help!")
     else:
         with st.spinner("Analyzing your learning gap and checking the ECM420 syllabus..."):
+            
+            # -> Save to database in the background! <-
+            log_to_sheets(confidence, days_remaining, student_struggle)
+            
             try:
-                # Read the syllabus file
                 syllabus_data = "Syllabus not found. Please provide general electromagnetics advice."
                 if os.path.exists("syllabus.txt"):
                     with open("syllabus.txt", "r", encoding="utf-8") as file:
                         syllabus_data = file.read()
 
-                # Configure the AI using Streamlit Secrets
                 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
                 model = genai.GenerativeModel('gemini-2.5-flash')
                 
@@ -68,7 +97,7 @@ if st.button("Generate My Sprint Plan 🚀"):
                 2. A structured, day-by-day study schedule spreading out the concepts over {days_remaining} days. Ensure your advice references topics from the syllabus. IMPORTANT: Do NOT quote the syllabus verbatim. Paraphrase all concepts in your own words to avoid recitation filters.
                 3. A suggested checkpoint question or mini-quiz at the end to test their understanding.
                 
-                Format the response beautifully using Markdown headings, bold text, and bullet points. Use LaTeX formatting only if you need to output complex physics equations (using $ and $$ delimiters).
+                Format the response beautifully using Markdown headings, bold text, and bullet points.
                 """
                 
                 response = model.generate_content(
@@ -85,7 +114,6 @@ if st.button("Generate My Sprint Plan 🚀"):
                     st.success("UiTM-Aligned Plan Generated Successfully!")
                     st.markdown(response.text)
                     
-                    # --- NEW: Download Button ---
                     st.markdown("---")
                     st.download_button(
                         label="📥 Download Your Study Plan",
@@ -94,7 +122,6 @@ if st.button("Generate My Sprint Plan 🚀"):
                         mime="text/plain"
                     )
                     st.caption("💡 *Tip: You can also right-click anywhere on this page and select 'Print' to save it as a PDF!*")
-                    # ----------------------------
                     
                 else:
                     block_reason = response.candidates[0].finish_reason if response.candidates else "UNKNOWN_ERROR"
