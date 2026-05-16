@@ -31,19 +31,15 @@ with main_col1:
     st.title("⚡ ESP: Electromagnetic Smart Planner 🎓")
 
 with main_col2:
-    # Safest educational database repository link - guaranteed to load with 0 blockers!
-    # 3. Main Page Content
-# Top header layout: Title on the left, Logo on the right for eCONDEV Affiliation
-main_col1, main_col2 = st.columns([3, 1])
-
-with main_col1:
-    st.title("⚡ ESP: Electromagnetic Smart Planner 🎓")
-
-with main_col2:
     # High-reliability direct link from an open academic server domain
     uitm_logo_url = "https://aims.uitm.edu.my/images/uitm_logo.png"
     st.image(uitm_logo_url, use_container_width=True)
 
+# --- MOBILE FRIENDLY IMAGE FIX ---
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image("https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=600&auto=format&fit=crop", use_container_width=True, caption="Calm Minds, Bright Futures")
+# ---------------------------------
 # --- MOBILE FRIENDLY IMAGE FIX ---
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
