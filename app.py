@@ -31,15 +31,14 @@ with main_col1:
     st.title("⚡ ESP: Electromagnetic Smart Planner 🎓")
 
 with main_col2:
-    # High-reliability direct link from an open academic server domain
-    uitm_logo_url = "https://aims.uitm.edu.my/images/uitm_logo.png"
-    st.image(uitm_logo_url, use_container_width=True)
+    # FIXED: Code reads your exact uploaded file string including the space and extension
+    fke_filename = "FKE logo.jpg"
+    if os.path.exists(fke_filename):
+        st.image(fke_filename, use_container_width=True)
+    else:
+        # High-reliability automatic fallback link if the file path is missed by GitHub cache
+        st.image("https://aims.uitm.edu.my/images/uitm_logo.png", use_container_width=True)
 
-# --- MOBILE FRIENDLY IMAGE FIX ---
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    st.image("https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=600&auto=format&fit=crop", use_container_width=True, caption="Calm Minds, Bright Futures")
-# ---------------------------------
 # --- MOBILE FRIENDLY IMAGE FIX ---
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
