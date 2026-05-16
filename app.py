@@ -32,7 +32,7 @@ with main_col1:
 
 with main_col2:
     # FIXED: Using the absolute live web link instead of a local file to prevent MediaFileStorageError
-    fke_logo_url = "https://fke.uitm.edu.my/images/fke_logo_trans.png"
+    fke_logo_url = "https://i.ibb.co/C5m6GQLj/fke-logo-trans.png"
     st.image(fke_logo_url, use_container_width=True)
 
 # --- MOBILE FRIENDLY IMAGE FIX ---
