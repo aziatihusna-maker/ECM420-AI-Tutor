@@ -11,6 +11,10 @@ from fpdf import FPDF
 st.set_page_config(page_title="EMT-Predict & Pace", page_icon="⚡", layout="centered")
 
 # 2. Sidebar Layout
+# This looks for the logo.png file in your GitHub repository and displays it at the top of the sidebar
+if os.path.exists("logo.png"):
+    st.sidebar.image("logo.png", use_container_width=True)
+
 st.sidebar.title("⚡ ESP")
 st.sidebar.write("**Electromagnetic Smart Planner**")
 st.sidebar.write("UiTM ECM420 Adaptive Study Planner & Tutor")
