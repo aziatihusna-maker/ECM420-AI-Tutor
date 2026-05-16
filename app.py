@@ -37,7 +37,7 @@ with main_col1:
 
 with main_col2:
     # Direct official FKE web logo link - loads perfectly and instantly
-    fke_logo_url = "https://fke.uitm.edu.my/images/fke_logo_trans.png"
+    fke_logo_url = "FKE logo.png"
     st.image(fke_logo_url, use_container_width=True)
 
 # --- MOBILE FRIENDLY IMAGE FIX ---
