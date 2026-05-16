@@ -17,17 +17,14 @@ days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_v
 # 3. Main Page Content
 st.title("Welcome to your ECM420 AI Tutor 🎓")
 
-# --- NEW WOW FACTOR: ABOUT EXPANDER ---
-with st.expander("ℹ️ About this App & How to Use It"):
-    st.markdown("""
-    **Welcome to EMT-Predict & Pace!** This Intelligent Tutoring System was developed by **Dr. Aziati Husna Awang** for UiTM engineering students tackling Electromagnetics Theory (ECM420). It acts as your personal 24/7 AI teaching assistant, cross-referencing your exact learning hurdles with the official UiTM syllabus to keep you on track.
-    
-    **How to use this tool:**
-    1. 👈 **Set your profile:** Use the sidebar on the left to set your current confidence level and the days remaining until your assessment.
-    2. ✍️ **Describe your struggle:** In the text box below, be specific! For example, instead of saying *"I don't get chapter 2,"* try *"I am confused by how to apply Gauss's Law to a cylindrical surface."*
-    3. 🚀 **Generate:** Click the button to receive your customized, bite-sized study sprint and checkpoint questions!
-    """)
-# ---------------------------------------
+# --- IMPROVED VISIBILITY: Colored Info Box ---
+st.info("""
+**👉 HOW TO USE YOUR AI TUTOR:**
+1. **Set your profile (Left Sidebar):** Adjust your confidence level and the days remaining until your test.
+2. **Describe your struggle:** Be specific! (e.g., *"I don't know how to apply Gauss's Law to a cylindrical surface."*)
+3. **Generate:** Click the button below to get your custom sprint schedule.
+""")
+# ---------------------------------------------
 
 st.write("Having trouble with Electromagnetics Theory? Tell me exactly what is confusing you, and I will generate a custom, day-by-day sprint schedule mapped directly to your UiTM syllabus.")
 
@@ -49,7 +46,7 @@ if st.button("Generate My Sprint Plan 🚀"):
                     with open("syllabus.txt", "r", encoding="utf-8") as file:
                         syllabus_data = file.read()
 
-                # Configure the AI using Streamlit Secrets!
+                # Configure the AI using Streamlit Secrets
                 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
                 model = genai.GenerativeModel('gemini-2.5-flash')
                 
@@ -87,6 +84,18 @@ if st.button("Generate My Sprint Plan 🚀"):
                 if response.candidates and response.candidates[0].content.parts:
                     st.success("UiTM-Aligned Plan Generated Successfully!")
                     st.markdown(response.text)
+                    
+                    # --- NEW: Download Button ---
+                    st.markdown("---")
+                    st.download_button(
+                        label="📥 Download Your Study Plan",
+                        data=response.text,
+                        file_name="ECM420_Study_Plan.txt",
+                        mime="text/plain"
+                    )
+                    st.caption("💡 *Tip: You can also right-click anywhere on this page and select 'Print' to save it as a PDF!*")
+                    # ----------------------------
+                    
                 else:
                     block_reason = response.candidates[0].finish_reason if response.candidates else "UNKNOWN_ERROR"
                     st.error(f"⚠️ The AI blocked the response. (Error Code: {block_reason}). Try rephrasing your struggle or shortening the syllabus.")
