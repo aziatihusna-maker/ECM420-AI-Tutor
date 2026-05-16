@@ -5,7 +5,7 @@ import json
 import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime
-from fpdf import FPDF
+from markdown_pdf import MarkdownPdf, Section
 
 # 1. Page Configuration
 st.set_page_config(page_title="EMT-Predict & Pace", page_icon="⚡", layout="centered")
@@ -24,11 +24,9 @@ confidence = st.sidebar.slider("Confidence Level in ECM420 (1=Lost, 10=Confident
 days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_value=1, max_value=30, value=7)
 
 # 3. Main Page Content
-# Added vertical_alignment="center" so the text and logo lock onto the exact same level!
 main_col1, main_col2 = st.columns([3, 1], vertical_alignment="center")
 
 with main_col1:
-    # Removed the awkward padding so Streamlit can naturally center it
     st.markdown(
         "<h2 style='margin: 0;'>⚡ ESP: Electromagnetic Smart Planner</h2>", 
         unsafe_allow_html=True
@@ -42,7 +40,6 @@ with main_col2:
         st.image("https://aims.uitm.edu.my/images/uitm_logo.png", use_container_width=True)
 
 # --- SINGLE MOBILE FRIENDLY IMAGE ---
-# Ensures only one image appears on the screen
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.image("https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=600&auto=format&fit=crop", use_container_width=True, caption="Calm Minds, Bright Futures")
@@ -75,15 +72,24 @@ def log_to_sheets(conf_level, days, struggle):
     except Exception as e:
         print(f"Database Error: {e}")
 
-# PDF Generator Function
-def create_pdf(plan_text):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Helvetica", size=11)
-    # Replaces emojis and special characters so the PDF doesn't crash
-    safe_text = plan_text.encode('latin-1', 'replace').decode('latin-1')
-    pdf.multi_cell(0, 7, text=safe_text)
-    return bytes(pdf.output())
+# --- UPDATED: PDF GENERATOR FUNCTION ---
+def create_pdf(markdown_text):
+    pdf = MarkdownPdf()
+    # Add a title and the markdown content
+    content = f"# ECM420 Study Plan\n\n{markdown_text}"
+    pdf.add_section(Section(content))
+    
+    # Save to a temporary file
+    temp_filename = "temp_plan.pdf"
+    pdf.save(temp_filename)
+    
+    # Read the bytes and delete the temp file
+    with open(temp_filename, "rb") as f:
+        pdf_bytes = f.read()
+    os.remove(temp_filename)
+    
+    return pdf_bytes
+# ---------------------------------------
 
 # 4. The Action Button & AI Logic
 if st.button("Generate My Sprint Plan 🚀"):
@@ -103,7 +109,6 @@ if st.button("Generate My Sprint Plan 🚀"):
                 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
                 model = genai.GenerativeModel('gemini-2.5-flash')
                 
-                # The prompt now strictly commands the AI to use a Markdown Table for the schedule!
                 system_prompt = f"""
                 You are an empathetic, expert university professor teaching Electromagnetics Theory (course code ECM420) at UiTM. 
                 A student has come to you for help.
@@ -119,7 +124,7 @@ if st.button("Generate My Sprint Plan 🚀"):
                 
                 Please provide:
                 1. A brief, encouraging diagnosis validating their struggle.
-                2. A structured, day-by-day study schedule spreading out the concepts over {days_remaining} days. Reference the syllabus. IMPORTANT: You MUST format this study schedule strictly as a beautiful Markdown table with the following columns: Day, Focus/Topic, Key Concepts, Activity, and Reference. Paraphrase all concepts to avoid recitation filters.
+                2. A structured, day-by-day study schedule spreading out the concepts over {days_remaining} days. Reference the syllabus. IMPORTANT: You MUST format this study schedule strictly as a Markdown table with the following columns: Day, Focus/Topic, Key Concepts, Activity, and Reference. Paraphrase all concepts to avoid recitation filters.
                 3. A suggested checkpoint question or mini-quiz at the end.
                 
                 Format the rest of the response beautifully using Markdown headings and bold text.
@@ -141,13 +146,16 @@ if st.button("Generate My Sprint Plan 🚀"):
                     
                     # --- PDF DOWNLOAD BUTTON ---
                     st.markdown("---")
-                    pdf_bytes = create_pdf(response.text)
-                    st.download_button(
-                        label="📥 Download Plan as PDF",
-                        data=pdf_bytes,
-                        file_name="ECM420_Study_Plan.pdf",
-                        mime="application/pdf"
-                    )
+                    try:
+                        pdf_bytes = create_pdf(response.text)
+                        st.download_button(
+                            label="📥 Download Plan as PDF",
+                            data=pdf_bytes,
+                            file_name="ECM420_Study_Plan.pdf",
+                            mime="application/pdf"
+                        )
+                    except Exception as pdf_error:
+                         st.error(f"⚠️ Plan generated, but PDF conversion failed: {pdf_error}. You can still copy the text above.")
                     # ---------------------------
                     
                 else:
