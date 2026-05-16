@@ -56,8 +56,8 @@ def log_to_sheets(conf_level, days, struggle):
         # Add a new row to the bottom of the sheet
         sheet.append_row([current_time, conf_level, days, struggle])
     except Exception as e:
-        # If it fails, print error to server logs but do not disrupt the student's app experience
-        print(f"Database Error: {e}")
+        # TEMPORARY FIX: Show the error on the screen so we can see it!
+        st.error(f"Database Debugging Error: {e}")
 # --------------------------------------
 
 # 4. The Action Button & AI Logic
