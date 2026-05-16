@@ -30,7 +30,7 @@ main_col1, main_col2 = st.columns([3, 1])
 with main_col1:
     # Slightly smaller, clean header with a bit of top padding to align with the center of the logo
     st.markdown(
-        "<h3 style='padding-top: 15px; margin: 0;'>⚡ ESP: Electromagnetic Smart Planner 🎓</h3>", 
+        "<h3 style='padding-top: 15px; margin: 0;'>⚡ ESP: Electromagnetic Smart Planner</h3>", 
         unsafe_allow_html=True
     )
 
