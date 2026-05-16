@@ -8,7 +8,7 @@ from datetime import datetime
 from fpdf import FPDF
 
 # 1. Page Configuration
-st.set_page_config(page_title="EMT-Predict & Pace", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="EMT-Predict & Pace", page_icon="⚡", layout="centered")
 
 # 2. Sidebar Layout
 st.sidebar.title("⚡ EMT-Predict & Pace")
@@ -26,15 +26,17 @@ days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_v
 # 3. Main Page Content
 st.title("Welcome to your ECM420 AI Tutor 🎓")
 
-# --- CALMER, SMALLER IMAGE ---
-# We use a minimalist image and force a smaller, fixed width (400px)
-st.image("https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=600&auto=format&fit=crop", width=400, caption="Calm Minds, Bright Futures")
-# ----------------------------
+# --- MOBILE FRIENDLY IMAGE FIX ---
+# We use columns to keep the image small on laptops, but automatically shrink on phones!
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image("https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=600&auto=format&fit=crop", use_container_width=True, caption="Calm Minds, Bright Futures")
+# ---------------------------------
 
 st.info("""
 **👉 HOW TO USE YOUR AI TUTOR:**
-1. **Set your profile (Left Sidebar):** Adjust your confidence level and the days remaining until your test.
-2. **Describe your struggle:** Be specific! (e.g., *"I don't know how to apply Gauss's Law to a cylindrical surface."*)
+1. **Set your profile (Left Sidebar):** Adjust your confidence level and days left. *(📱 Mobile users: Tap the **`>`** arrow at the top left of your screen to open the sidebar!)*
+2. **Describe your struggle:** Be specific! (e.g., *"I don't know how to apply Gauss's Law."*)
 3. **Generate:** Click the button below to get your custom sprint schedule.
 """)
 
