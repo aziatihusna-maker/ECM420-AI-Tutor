@@ -30,28 +30,27 @@ youtube_videos = [
 # -----------------------------------------------------
 
 # 2. Sidebar Layout
-# --- UPDATED: Logos are now placed side-by-side to save vertical space! ---
-logo_col1, logo_col2 = st.sidebar.columns(2, vertical_alignment="center")
+# --- UPDATED: Logos stacked vertically with the new FKElogo.png ---
+fke_filename = "FKElogo.png"
 
-with logo_col1:
-    fke_filename = "FKE logo.jpg"
-    if os.path.exists(fke_filename):
-        st.image(fke_filename, use_container_width=True)
-    else:
-        st.image("https://aims.uitm.edu.my/images/uitm_logo.png", use_container_width=True)
+# 1. FKE Logo on Top
+if os.path.exists(fke_filename):
+    st.sidebar.image(fke_filename, use_container_width=True)
+else:
+    st.sidebar.image("https://aims.uitm.edu.my/images/uitm_logo.png", use_container_width=True)
 
-with logo_col2:
-    if os.path.exists("Logo.png"):
-        st.image("Logo.png", use_container_width=True)
+# 2. AI Tutor Logo on Bottom
+if os.path.exists("Logo.png"):
+    st.sidebar.image("Logo.png", use_container_width=True)
 
-st.sidebar.title("⚡ ESP")
-st.sidebar.write("**Electromagnetic Smart Planner**")
-st.sidebar.write("UiTM ECM420 Adaptive Study Planner & Tutor")
+# --- SPACE SAVER: Compact titles and labels so no scrolling is needed! ---
+st.sidebar.markdown("### ⚡ ESP\n**Electromagnetic Smart Planner**\n*UiTM ECM420 Tutor*")
 st.sidebar.markdown("---")
 
 st.sidebar.subheader("Student Profile")
-confidence = st.sidebar.slider("Confidence Level in ECM420 (1=Lost, 10=Confident)", 1, 10, 5)
-days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_value=1, max_value=30, value=7)
+confidence = st.sidebar.slider("ECM420 Confidence (1-10)", 1, 10, 5)
+days_remaining = st.sidebar.number_input("Days to Assessment", min_value=1, max_value=30, value=7)
+# -----------------------------------------------------------------------
 
 # 3. Main Page Content
 st.markdown(
