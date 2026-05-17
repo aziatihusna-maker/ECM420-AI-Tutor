@@ -105,6 +105,7 @@ if st.button("Generate My Sprint Plan 🚀"):
                 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
                 model = genai.GenerativeModel('gemini-2.5-flash')
                 
+                # FIXED: Added the YouTube playlist instruction directly into the AI's brain!
                 system_prompt = f"""
                 You are an empathetic, expert university professor teaching Electromagnetics Theory (course code ECM420) at UiTM. 
                 A student has come to you for help.
@@ -119,7 +120,7 @@ if st.button("Generate My Sprint Plan 🚀"):
                 Their specific struggle: "{student_struggle}"
                 
                 Please provide:
-                1. A brief, encouraging diagnosis validating their struggle.
+                1. A brief, encouraging diagnosis validating their struggle. CRITICAL: In your diagnosis, you MUST explicitly tell the student to watch the corresponding topics in Dr. Aziati's YouTube playlist provided below in the app.
                 2. A structured, day-by-day study schedule spreading out the concepts over {days_remaining} days. Reference the syllabus. IMPORTANT: You MUST format this study schedule strictly as a Markdown table with exactly 5 columns. You MUST include a valid formatting separator row right under the headers (e.g., |---|---|---|---|---|). Paraphrase all concepts to avoid recitation filters.
                 3. A suggested checkpoint question or mini-quiz at the end.
                 
@@ -144,6 +145,13 @@ if st.button("Generate My Sprint Plan 🚀"):
                     st.success("UiTM-Aligned Plan Generated Successfully!")
                     st.markdown(response.text)
                     
+                    # --- NEW: EMBEDDED YOUTUBE PLAYLIST ---
+                    st.markdown("---")
+                    st.subheader("📺 Dr. Aziati's ECM420 Lecture Series")
+                    st.write("Use the playlist menu (top right of the video) to find the exact lecture for your daily sprint!")
+                    st.video("https://www.youtube.com/watch?v=CQcfN21XrKI&list=PLPOivWONMRkcdSL5-ae1w1NTJqIWCwYW6")
+                    # --------------------------------------
+                    
                     # --- PDF DOWNLOAD BUTTON ---
                     st.markdown("---")
                     
@@ -166,11 +174,9 @@ if st.button("Generate My Sprint Plan 🚀"):
                     block_reason = response.candidates[0].finish_reason if response.candidates else "UNKNOWN_ERROR"
                     st.error(f"⚠️ The AI blocked the response. (Error Code: {block_reason}). Try rephrasing your struggle or shortening the syllabus.")
                 
-            # --- NEW STUDENT-FRIENDLY ERROR CATCHER ---
             except Exception as e:
                 error_msg = str(e)
                 if "429" in error_msg or "quota" in error_msg.lower():
                     st.warning("⏳ The AI tutor is currently helping a lot of students at once! Please take a deep breath, wait a minute or two, and click Generate again.")
                 else:
                     st.error(f"An error occurred while contacting the AI: {e}")
-            # ------------------------------------------
