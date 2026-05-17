@@ -11,7 +11,7 @@ from markdown_pdf import MarkdownPdf, Section
 # 1. Page Configuration
 st.set_page_config(page_title="EMT-Predict & Pace", page_icon="⚡", layout="centered")
 
-# --- NEW: Image & Video Databases for Randomization ---
+# --- Image & Video Databases for Randomization ---
 # A list of cool, simple electromagnetics/physics images from Unsplash
 em_images = [
     "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&auto=format&fit=crop", # Circuit/Tech
@@ -20,12 +20,12 @@ em_images = [
     "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop"  # Electromagnetic space/earth
 ]
 
-# Put your specific YouTube video links here! The app will pick a random one each time.
+# Dr. Aziati's Cleaned YouTube Video Links
 youtube_videos = [
     "https://www.youtube.com/watch?v=CQcfN21XrKI", 
-    "https://www.youtube.com/watch?v=YOUR_SECOND_VIDEO_LINK", # REPLACE ME
-    "https://www.youtube.com/watch?v=YOUR_THIRD_VIDEO_LINK",  # REPLACE ME
-    "https://www.youtube.com/watch?v=YOUR_FOURTH_VIDEO_LINK"  # REPLACE ME
+    "https://www.youtube.com/watch?v=acvNnQBC7mM",
+    "https://www.youtube.com/watch?v=BD3d3C2JQdA",
+    "https://www.youtube.com/watch?v=EOO880qh2yU"
 ]
 # -----------------------------------------------------
 
@@ -61,7 +61,6 @@ with main_col2:
 # --- RANDOM MOBILE FRIENDLY IMAGE ---
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
-    # Replaced the books with a random electromagnetics image!
     st.image(random.choice(em_images), use_container_width=True, caption="Master the Forces of Nature ⚡")
 # ------------------------------------
 
@@ -156,51 +155,3 @@ if st.button("Generate My Sprint Plan 🚀"):
                         {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
                         {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
                         {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-                        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
-                    ]
-                )
-                
-                if response.candidates and response.candidates[0].content.parts:
-                    st.success("UiTM-Aligned Plan Generated Successfully!")
-                    st.markdown(response.text)
-                    
-                    # --- NEW: EXTRA RANDOM IMAGE & RANDOM VIDEO IN THE ANSWER ---
-                    st.markdown("---")
-                    
-                    # Pop in a second random EM image to break up the text visually!
-                    st.image(random.choice(em_images), use_container_width=True, caption="Visualize the Field")
-                    
-                    st.subheader("📺 Recommended Dr. Aziati Lecture")
-                    st.write("Based on your study plan, here is a helpful lecture to get you started:")
-                    # Picks a random video from the list we made at the top!
-                    st.video(random.choice(youtube_videos))
-                    # ------------------------------------------------------------
-                    
-                    # --- PDF DOWNLOAD BUTTON ---
-                    st.markdown("---")
-                    
-                    clean_md = response.text.replace("\n||\n", "\n|---|---|---|---|---|\n")
-                    clean_md = clean_md.replace("\n| |\n", "\n|---|---|---|---|---|\n")
-                    
-                    try:
-                        pdf_bytes = create_pdf(clean_md)
-                        st.download_button(
-                            label="📥 Download Plan as PDF",
-                            data=pdf_bytes,
-                            file_name="ECM420_Study_Plan.pdf",
-                            mime="application/pdf"
-                        )
-                    except Exception as pdf_error:
-                         st.error(f"⚠️ Plan generated, but PDF conversion failed: {pdf_error}. You can still copy the text above.")
-                    # ---------------------------
-                    
-                else:
-                    block_reason = response.candidates[0].finish_reason if response.candidates else "UNKNOWN_ERROR"
-                    st.error(f"⚠️ The AI blocked the response. (Error Code: {block_reason}). Try rephrasing your struggle or shortening the syllabus.")
-                
-            except Exception as e:
-                error_msg = str(e)
-                if "429" in error_msg or "quota" in error_msg.lower():
-                    st.warning("⏳ The AI tutor is currently helping a lot of students at once! Please take a deep breath, wait a minute or two, and click Generate again.")
-                else:
-                    st.error(f"An error occurred while contacting the AI: {e}")
