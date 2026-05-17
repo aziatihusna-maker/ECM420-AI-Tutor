@@ -3,12 +3,31 @@ import google.generativeai as genai
 import os
 import json
 import gspread
+import random
 from google.oauth2.service_account import Credentials
 from datetime import datetime
 from markdown_pdf import MarkdownPdf, Section
 
 # 1. Page Configuration
 st.set_page_config(page_title="EMT-Predict & Pace", page_icon="⚡", layout="centered")
+
+# --- NEW: Image & Video Databases for Randomization ---
+# A list of cool, simple electromagnetics/physics images from Unsplash
+em_images = [
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&auto=format&fit=crop", # Circuit/Tech
+    "https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0?q=80&w=600&auto=format&fit=crop", # Science lab
+    "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=600&auto=format&fit=crop", # Magnetic waves abstract
+    "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop"  # Electromagnetic space/earth
+]
+
+# Put your specific YouTube video links here! The app will pick a random one each time.
+youtube_videos = [
+    "https://www.youtube.com/watch?v=CQcfN21XrKI", 
+    "https://www.youtube.com/watch?v=YOUR_SECOND_VIDEO_LINK", # REPLACE ME
+    "https://www.youtube.com/watch?v=YOUR_THIRD_VIDEO_LINK",  # REPLACE ME
+    "https://www.youtube.com/watch?v=YOUR_FOURTH_VIDEO_LINK"  # REPLACE ME
+]
+# -----------------------------------------------------
 
 # 2. Sidebar Layout
 if os.path.exists("Logo.png"):
@@ -39,10 +58,11 @@ with main_col2:
     else:
         st.image("https://aims.uitm.edu.my/images/uitm_logo.png", use_container_width=True)
 
-# --- SINGLE MOBILE FRIENDLY IMAGE ---
+# --- RANDOM MOBILE FRIENDLY IMAGE ---
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
-    st.image("https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=600&auto=format&fit=crop", use_container_width=True, caption="Calm Minds, Bright Futures")
+    # Replaced the books with a random electromagnetics image!
+    st.image(random.choice(em_images), use_container_width=True, caption="Master the Forces of Nature ⚡")
 # ------------------------------------
 
 st.info("""
@@ -105,7 +125,6 @@ if st.button("Generate My Sprint Plan 🚀"):
                 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
                 model = genai.GenerativeModel('gemini-2.5-flash')
                 
-                # FIXED: Added the YouTube playlist instruction directly into the AI's brain!
                 system_prompt = f"""
                 You are an empathetic, expert university professor teaching Electromagnetics Theory (course code ECM420) at UiTM. 
                 A student has come to you for help.
@@ -120,7 +139,7 @@ if st.button("Generate My Sprint Plan 🚀"):
                 Their specific struggle: "{student_struggle}"
                 
                 Please provide:
-                1. A brief, encouraging diagnosis validating their struggle. CRITICAL: In your diagnosis, you MUST explicitly tell the student to watch the corresponding topics in Dr. Aziati's YouTube playlist provided below in the app.
+                1. A brief, encouraging diagnosis validating their struggle. CRITICAL: In your diagnosis, explicitly tell the student to watch the recommended video lecture provided below in the app.
                 2. A structured, day-by-day study schedule spreading out the concepts over {days_remaining} days. Reference the syllabus. IMPORTANT: You MUST format this study schedule strictly as a Markdown table with exactly 5 columns. You MUST include a valid formatting separator row right under the headers (e.g., |---|---|---|---|---|). Paraphrase all concepts to avoid recitation filters.
                 3. A suggested checkpoint question or mini-quiz at the end.
                 
@@ -145,12 +164,17 @@ if st.button("Generate My Sprint Plan 🚀"):
                     st.success("UiTM-Aligned Plan Generated Successfully!")
                     st.markdown(response.text)
                     
-                    # --- NEW: EMBEDDED YOUTUBE PLAYLIST ---
+                    # --- NEW: EXTRA RANDOM IMAGE & RANDOM VIDEO IN THE ANSWER ---
                     st.markdown("---")
-                    st.subheader("📺 Dr. Aziati's ECM420 Lecture Series")
-                    st.write("Use the playlist menu (top right of the video) to find the exact lecture for your daily sprint!")
-                    st.video("https://www.youtube.com/watch?v=CQcfN21XrKI&list=PLPOivWONMRkcdSL5-ae1w1NTJqIWCwYW6")
-                    # --------------------------------------
+                    
+                    # Pop in a second random EM image to break up the text visually!
+                    st.image(random.choice(em_images), use_container_width=True, caption="Visualize the Field")
+                    
+                    st.subheader("📺 Recommended Dr. Aziati Lecture")
+                    st.write("Based on your study plan, here is a helpful lecture to get you started:")
+                    # Picks a random video from the list we made at the top!
+                    st.video(random.choice(youtube_videos))
+                    # ------------------------------------------------------------
                     
                     # --- PDF DOWNLOAD BUTTON ---
                     st.markdown("---")
