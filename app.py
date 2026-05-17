@@ -30,6 +30,16 @@ youtube_videos = [
 # -----------------------------------------------------
 
 # 2. Sidebar Layout
+# --- MOVED: FKE Logo now sits proudly at the very top of the sidebar ---
+fke_filename = "FKE logo.jpg"
+if os.path.exists(fke_filename):
+    st.sidebar.image(fke_filename, use_container_width=True)
+else:
+    st.sidebar.image("https://aims.uitm.edu.my/images/uitm_logo.png", use_container_width=True)
+
+st.sidebar.markdown("---")
+
+# Your AI Tutor Logo right below the FKE Logo
 if os.path.exists("Logo.png"):
     st.sidebar.image("Logo.png", use_container_width=True)
 
@@ -43,20 +53,11 @@ confidence = st.sidebar.slider("Confidence Level in ECM420 (1=Lost, 10=Confident
 days_remaining = st.sidebar.number_input("Days Remaining until Exam/Quiz", min_value=1, max_value=30, value=7)
 
 # 3. Main Page Content
-main_col1, main_col2 = st.columns([3, 1], vertical_alignment="center")
-
-with main_col1:
-    st.markdown(
-        "<h2 style='margin: 0;'>⚡ ESP: Electromagnetic Smart Planner</h2>", 
-        unsafe_allow_html=True
-    )
-
-with main_col2:
-    fke_filename = "FKE logo.jpg"
-    if os.path.exists(fke_filename):
-        st.image(fke_filename, use_container_width=True)
-    else:
-        st.image("https://aims.uitm.edu.my/images/uitm_logo.png", use_container_width=True)
+# Since the logo moved, the title now gets the full width to breathe!
+st.markdown(
+    "<h2 style='margin: 0; padding-bottom: 20px;'>⚡ ESP: Electromagnetic Smart Planner</h2>", 
+    unsafe_allow_html=True
+)
 
 # --- RANDOM MOBILE FRIENDLY IMAGE ---
 col1, col2, col3 = st.columns([1, 2, 1])
@@ -143,63 +144,4 @@ if st.button("Generate My Sprint Plan 🚀"):
                 3. A suggested checkpoint question or mini-quiz at the end.
                 
                 CRITICAL FORMATTING RULES FOR PDF COMPATIBILITY:
-                - DO NOT use LaTeX, MathJax, or dollar signs ($ or $$) for equations or Greek letters under ANY circumstances. The PDF converter will crash.
-                - Use plain English words for Greek letters (e.g., type "rho", "theta", "phi", "epsilon").
-                - Use plain keyboard text for formulas (e.g., type "x = r * cos(theta)").
-                - Keep text formatting simple. Use standard **bold** and *italics* only. Do not skip heading levels (use ## then ###).
-                """
-                
-                response = model.generate_content(
-                    system_prompt,
-                    safety_settings=[
-                        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-                        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-                        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-                        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
-                    ]
-                )
-                
-                if response.candidates and response.candidates[0].content.parts:
-                    st.success("UiTM-Aligned Plan Generated Successfully!")
-                    st.markdown(response.text)
-                    
-                    # --- EXTRA RANDOM IMAGE & RANDOM VIDEO IN THE ANSWER ---
-                    st.markdown("---")
-                    
-                    # Pop in a second random EM image to break up the text visually!
-                    st.image(random.choice(em_images), use_container_width=True, caption="Visualize the Field")
-                    
-                    st.subheader("📺 Recommended Dr. Aziati Lecture")
-                    st.write("Based on your study plan, here is a helpful lecture to get you started:")
-                    # Picks a random video from the cleaned list!
-                    st.video(random.choice(youtube_videos))
-                    # ------------------------------------------------------------
-                    
-                    # --- PDF DOWNLOAD BUTTON ---
-                    st.markdown("---")
-                    
-                    clean_md = response.text.replace("\n||\n", "\n|---|---|---|---|---|\n")
-                    clean_md = clean_md.replace("\n| |\n", "\n|---|---|---|---|---|\n")
-                    
-                    try:
-                        pdf_bytes = create_pdf(clean_md)
-                        st.download_button(
-                            label="📥 Download Plan as PDF",
-                            data=pdf_bytes,
-                            file_name="ECM420_Study_Plan.pdf",
-                            mime="application/pdf"
-                        )
-                    except Exception as pdf_error:
-                         st.error(f"⚠️ Plan generated, but PDF conversion failed: {pdf_error}. You can still copy the text above.")
-                    # ---------------------------
-                    
-                else:
-                    block_reason = response.candidates[0].finish_reason if response.candidates else "UNKNOWN_ERROR"
-                    st.error(f"⚠️ The AI blocked the response. (Error Code: {block_reason}). Try rephrasing your struggle or shortening the syllabus.")
-                
-            except Exception as e:
-                error_msg = str(e)
-                if "429" in error_msg or "quota" in error_msg.lower():
-                    st.warning("⏳ The AI tutor is currently helping a lot of students at once! Please take a deep breath, wait a minute or two, and click Generate again.")
-                else:
-                    st.error(f"An error occurred while contacting the AI: {e}")
+                - DO NOT use LaTeX, MathJax, or dollar signs ($ or $$) for equations or Greek letters under ANY circumstances. The PDF
