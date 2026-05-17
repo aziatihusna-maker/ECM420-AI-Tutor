@@ -1,6 +1,5 @@
 streamlit
-google-generativeai
 gspread
 google-auth
-fpdf2
 markdown-pdf
+anthropic
