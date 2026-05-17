@@ -20,12 +20,12 @@ em_images = [
     "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop"  # Electromagnetic space/earth
 ]
 
-# Dr. Aziati's Cleaned YouTube Video Links
+# Dr. Aziati's Cleaned YouTube Video Links (Using shortlinks for better embedding)
 youtube_videos = [
-    "https://www.youtube.com/watch?v=CQcfN21XrKI", 
-    "https://www.youtube.com/watch?v=acvNnQBC7mM",
-    "https://www.youtube.com/watch?v=BD3d3C2JQdA",
-    "https://www.youtube.com/watch?v=EOO880qh2yU"
+    "https://youtu.be/CQcfN21XrKI", 
+    "https://youtu.be/acvNnQBC7mM",
+    "https://youtu.be/BD3d3C2JQdA",
+    "https://youtu.be/EOO880qh2yU"
 ]
 # -----------------------------------------------------
 
