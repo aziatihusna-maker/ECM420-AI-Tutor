@@ -36,7 +36,6 @@ if os.path.exists("Logo.png"):
 st.sidebar.markdown("### ⚡ ESP\n**Electromagnetic Smart Planner**\n*UiTM ECM420 Tutor*")
 st.sidebar.markdown("---")
 
-# NEW: Left Panel Guide for Students
 st.sidebar.info("""
 **💡 How to use this panel:**
 * **Confidence Level:** Be honest! A lower score tells the AI to explain things more gently and thoroughly.
@@ -54,7 +53,6 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.image(random.choice(em_images), use_container_width=True, caption="Master the Forces of Nature ⚡")
 
-# NEW: About Paragraph explaining the tools
 st.markdown("### Welcome to your Personal AI Teaching Assistant! 🤖")
 st.write("""
 Electromagnetics Theory can be tough, but you don't have to study alone. I am here to help you navigate the ECM420 syllabus using three unique learning tools. 
@@ -63,7 +61,8 @@ Electromagnetics Theory can be tough, but you don't have to study alone. I am he
 """)
 
 # --- 5. Helper Functions ---
-def log_to_sheets(conf_level, days, struggle):
+# UPDATED: Now accepts 'tool_used' as a parameter to track which tab they clicked!
+def log_to_sheets(conf_level, days, tool_used, student_input):
     try:
         if "GOOGLE_CREDENTIALS_JSON" in st.secrets:
             creds_dict = json.loads(st.secrets["GOOGLE_CREDENTIALS_JSON"])
@@ -72,7 +71,8 @@ def log_to_sheets(conf_level, days, struggle):
             client = gspread.authorize(creds)
             sheet = client.open("ECM420_Database").sheet1
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            sheet.append_row([current_time, conf_level, days, struggle])
+            # Appends 5 columns to your Google Sheet
+            sheet.append_row([current_time, conf_level, days, tool_used, student_input])
     except Exception as e:
         print(f"Database Logging Error: {e}")
 
@@ -114,7 +114,8 @@ with tab1:
             st.warning("⚠️ Please describe what you are struggling with so I can help!")
         else:
             with st.spinner("Analyzing your learning gap with Claude AI..."):
-                log_to_sheets(confidence, days_remaining, student_struggle)
+                # LOGGING: Tags as "Sprint Plan"
+                log_to_sheets(confidence, days_remaining, "Sprint Plan", student_struggle)
                 
                 try:
                     syllabus_data = "Syllabus not found. Please provide general electromagnetics advice."
@@ -176,6 +177,9 @@ with tab2:
             st.warning("⚠️ Please type your explanation first!")
         else:
             with st.spinner("Reviewing your explanation like a strict but fair professor..."):
+                # LOGGING: Tags as "Feynman Checker"
+                log_to_sheets(confidence, days_remaining, "Feynman Checker", student_explanation)
+                
                 try:
                     client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"])
                     
@@ -214,6 +218,9 @@ with tab3:
             st.warning("⚠️ Please enter a topic!")
         else:
             with st.spinner("Brewing up a real-world analogy..."):
+                # LOGGING: Tags as "Analogy Engine"
+                log_to_sheets(confidence, days_remaining, "Analogy Engine", analogy_topic)
+                
                 try:
                     client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"])
                     
