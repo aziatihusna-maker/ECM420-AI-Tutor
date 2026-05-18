@@ -6,6 +6,8 @@ import gspread
 import random
 import pandas as pd
 import plotly.express as px
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 from google.oauth2.service_account import Credentials
 from datetime import datetime
 from markdown_pdf import MarkdownPdf, Section
@@ -212,7 +214,6 @@ with tab4:
     st.markdown("### 🔒 Instructor Analytics Dashboard")
     st.write("Enter the admin password to view real-time class analytics.")
     
-    # We use st.secrets.get() as a safeguard in case the secret hasn't fully loaded yet
     admin_password = st.text_input("Password", type="password")
     correct_password = st.secrets.get("ADMIN_PASSWORD", "default_fallback_password")
 
@@ -223,7 +224,6 @@ with tab4:
         else:
             st.error("❌ Incorrect Password")
 
-    # If logged in successfully, show the dashboard
     if st.session_state.get("admin_logged_in", False):
         st.success("✅ Logged in successfully!")
         
@@ -233,7 +233,6 @@ with tab4:
         st.markdown("---")
         with st.spinner("Fetching live data from Google Sheets..."):
             try:
-                # Fetch data directly from the spreadsheet
                 client = get_gspread_client()
                 sheet = client.open("ECM420_Database").sheet1
                 data = sheet.get_all_records()
@@ -241,10 +240,15 @@ with tab4:
                 if not data:
                     st.info("No data has been logged yet. Tell your students to start using the app!")
                 else:
-                    # Convert to Pandas DataFrame for easy analysis
                     df = pd.DataFrame(data)
                     
-                    # Ensure we have the right columns
+                    # BULLETPROOF FIX: Strip away any hidden spaces in the Google Sheet column names
+                    df.columns = df.columns.astype(str).str.strip()
+                    
+                    # Ensure Confidence Level acts as a number for the charts
+                    if 'Confidence Level' in df.columns:
+                        df['Confidence Level'] = pd.to_numeric(df['Confidence Level'], errors='coerce')
+                    
                     if 'Confidence Level' in df.columns and 'Tool Used' in df.columns:
                         
                         # --- Metrics Row ---
@@ -276,13 +280,31 @@ with tab4:
 
                         st.markdown("---")
                         
-                        # --- Raw Data Table ---
-                        st.markdown("**📝 Raw Student Inputs (What they are struggling with)**")
-                        # Displaying only the relevant columns to read
+                        # --- Word Cloud Section ---
+                        st.markdown("**☁️ Student Struggles Word Cloud**")
+                        st.write("The larger the word, the more frequently students are asking about it!")
+                        
                         if 'Student Input' in df.columns:
-                            st.dataframe(df[['Timestamp', 'Tool Used', 'Student Input', 'Confidence Level']], use_container_width=True)
-                        else:
-                            st.dataframe(df, use_container_width=True)
+                            # Combine all text inputs into one big string
+                            text_data = " ".join(df['Student Input'].dropna().astype(str).tolist())
                             
-            except Exception as e:
-                st.error(f"⚠️ Error fetching data: {e}")
+                            if text_data.strip(): # Ensure there is actually text
+                                # Generate a green-themed word cloud
+                                wordcloud = WordCloud(width=800, height=400, background_color='white', colormap='Greens').generate(text_data)
+                                
+                                # Display it using matplotlib
+                                fig_wc, ax = plt.subplots(figsize=(10, 5))
+                                ax.imshow(wordcloud, interpolation='bilinear')
+                                ax.axis('off') # Hide axes
+                                st.pyplot(fig_wc)
+                            else:
+                                st.info("Not enough text data to generate a word cloud yet.")
+                        else:
+                            st.warning("⚠️ Could not generate Word Cloud: Missing 'Student Input' column.")
+                        
+                        st.markdown("---")
+
+                        # --- Raw Data Table ---
+                        st.markdown("**📝 Raw Student Inputs**")
+                        
+                        # BULLETPROOF FIX: Safely pick the columns that actually exist to
