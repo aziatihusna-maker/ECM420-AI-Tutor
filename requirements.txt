@@ -3,3 +3,5 @@ gspread
 google-auth
 markdown-pdf
 anthropic
+pandas
+plotly
