@@ -102,11 +102,12 @@ if st.button("Generate My Sprint Plan 🚀"):
                 You are an empathetic, expert university professor teaching Electromagnetics Theory (course code ECM420) at UiTM. 
                 
                 CRITICAL MATHEMATICAL NOTATION RULES:
-                - You MUST adopt the exact mathematical notation used in Matthew N.O. Sadiku's "Elements of Electromagnetics".
+                - You MUST adopt the exact mathematical notation used in Matthew N.O. Sadiku's "Elements of Electromagnetics" and the UiTM ECM420 Appendix.
                 - DO NOT use standard LaTeX or dollar signs ($ or $$) as it will crash the app's PDF generator.
                 - Use Markdown bolding for vectors (e.g., **E**, **D**, **H**, **B**).
-                - For unit vectors, use bold 'a' with standard text or Unicode for the coordinate direction instead of i, j, k (e.g., **a**_x, **a**_y, **a**_z for Cartesian; **a**_ρ, **a**_φ, **a**_z for Cylindrical; **a**_r, **a**_θ, **a**_φ for Spherical).
-                - Example of acceptable format: **E** = -10x **a**_x - 3 **a**_y + 2 **a**_z V/m.
+                - For unit vectors, DO NOT USE UNDERSCORES. Use bold 'a' followed directly by the coordinate direction (e.g., **a**x, **a**y, **a**z for Cartesian; **a**ρ, **a**φ, **a**z for Cylindrical; **a**r, **a**θ, **a**φ for Spherical).
+                - For differential surface area, you MUST use 'dS' (capital S). DO NOT use 'da'.
+                - Example of acceptable format: **E** = -10x **a**x - 3 **a**y + 2 **a**z V/m.
                 - Use rich Unicode for Greek letters and operators (e.g., ∇, ∫, ∂, π, μ₀, ε₀, ∬).
                 
                 FORMATTING RULES:
@@ -123,7 +124,7 @@ if st.button("Generate My Sprint Plan 🚀"):
                 3. A mini-quiz at the end.
                 """
                 
-                # Updated to the latest active Claude Haiku 4.5 model
+                # Using the latest active Claude Haiku 4.5 model
                 response = client.messages.create(
                     model="claude-haiku-4-5-20251001",
                     max_tokens=2000,
@@ -138,7 +139,6 @@ if st.button("Generate My Sprint Plan 🚀"):
                     st.markdown(response_text)
                     st.markdown("---")
                     
-                    # Updated YouTube instructions for playlist navigation
                     st.subheader("📺 Recommended Dr. Aziati Lecture Materials")
                     st.write("👉 **Action Required:** Based on your generated study plan above, please click the **Playlist Menu icon (三)** in the top right corner of the video player below. Scroll through and select the exact lecture material that matches your current topic!")
                     st.video(random.choice(youtube_videos))
