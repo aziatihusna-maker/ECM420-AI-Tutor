@@ -36,6 +36,13 @@ if os.path.exists("Logo.png"):
 st.sidebar.markdown("### ⚡ ESP\n**Electromagnetic Smart Planner**\n*UiTM ECM420 Tutor*")
 st.sidebar.markdown("---")
 
+# NEW: Left Panel Guide for Students
+st.sidebar.info("""
+**💡 How to use this panel:**
+* **Confidence Level:** Be honest! A lower score tells the AI to explain things more gently and thoroughly.
+* **Days to Assessment:** This determines exactly how many days your custom Sprint Plan will cover.
+""")
+
 st.sidebar.subheader("Student Profile")
 confidence = st.sidebar.slider("ECM420 Confidence (1-10)", 1, 10, 5)
 days_remaining = st.sidebar.number_input("Days to Assessment", min_value=1, max_value=30, value=7)
@@ -46,6 +53,14 @@ st.markdown("<h2 style='margin: 0; padding-bottom: 20px;'>⚡ ESP: Electromagnet
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.image(random.choice(em_images), use_container_width=True, caption="Master the Forces of Nature ⚡")
+
+# NEW: About Paragraph explaining the tools
+st.markdown("### Welcome to your Personal AI Teaching Assistant! 🤖")
+st.write("""
+Electromagnetics Theory can be tough, but you don't have to study alone. I am here to help you navigate the ECM420 syllabus using three unique learning tools. 
+
+*(Make sure you set your Profile in the left sidebar first! Mobile users: Tap the **`>`** arrow at the top left to open the menu).*
+""")
 
 # --- 5. Helper Functions ---
 def log_to_sheets(conf_level, days, struggle):
@@ -72,7 +87,6 @@ def create_pdf(markdown_text):
     os.remove(temp_filename)
     return pdf_bytes
 
-# Shared system instruction to ensure Sadiku notation everywhere
 shared_system_instructions = """
 You are an empathetic, expert university professor teaching Electromagnetics Theory (course code ECM420) at UiTM. 
 CRITICAL MATHEMATICAL NOTATION RULES:
@@ -88,15 +102,10 @@ CRITICAL MATHEMATICAL NOTATION RULES:
 tab1, tab2, tab3 = st.tabs(["🚀 Sprint Plan", "🧠 Feynman Checker", "🌊 Analogy Engine"])
 
 # ==========================================
-# TAB 1: SPRINT PLANNER (Your Original App)
+# TAB 1: SPRINT PLANNER 
 # ==========================================
 with tab1:
-    st.info("""
-    **👉 HOW TO USE YOUR AI TUTOR:**
-    1. **Set your profile (Left Sidebar):** Adjust your confidence level and days left. 
-    2. **Describe your struggle:** Be specific!
-    3. **Generate:** Click the button below to get your custom sprint schedule.
-    """)
+    st.info("**Tool 1: Sprint Plan** - Tell me what topic you are struggling with, and I will generate a custom, day-by-day study schedule aligned with your remaining days.")
 
     student_struggle = st.text_area("Having trouble with Electromagnetics Theory? Tell me exactly what is confusing you:", height=100)
 
@@ -158,7 +167,7 @@ with tab1:
 # TAB 2: FEYNMAN CONCEPT CHECKER
 # ==========================================
 with tab2:
-    st.info("💡 **The Feynman Technique:** The best way to learn is to teach. Explain an ECM420 concept in your own words, and I will grade your understanding!")
+    st.info("**Tool 2: Feynman Checker** - The best way to learn is to teach. Explain an ECM420 concept in your own words below, and I will grade your understanding like a professor!")
     
     student_explanation = st.text_area("Explain a concept to me (e.g., How does Gauss's Law work? Why do we use cylindrical coordinates?):", height=150)
     
@@ -196,7 +205,7 @@ with tab2:
 # TAB 3: REAL-WORLD ANALOGY ENGINE
 # ==========================================
 with tab3:
-    st.info("🌊 **Invisible Forces Made Real:** Electromagnetics is notoriously abstract. Tell me what formula or concept you are stuck on, and I will explain it using a real-world physical analogy.")
+    st.info("**Tool 3: Analogy Engine** - Invisible forces are notoriously abstract. Tell me what formula or concept you are stuck on, and I will explain it using a real-world physical analogy.")
     
     analogy_topic = st.text_input("What concept is confusing you? (e.g., Divergence, Magnetic Flux, Biot-Savart Law)")
     
