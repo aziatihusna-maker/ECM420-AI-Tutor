@@ -47,15 +47,6 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.image(random.choice(em_images), use_container_width=True, caption="Master the Forces of Nature ⚡")
 
-st.info("""
-**👉 HOW TO USE YOUR AI TUTOR:**
-1. **Set your profile (Left Sidebar):** Adjust your confidence level and days left. 
-2. **Describe your struggle:** Be specific! (e.g., *"I don't know how to apply Gauss's Law."*)
-3. **Generate:** Click the button below to get your custom sprint schedule.
-""")
-
-student_struggle = st.text_area("Having trouble with Electromagnetics Theory? Tell me exactly what is confusing you:", height=150)
-
 # --- 5. Helper Functions ---
 def log_to_sheets(conf_level, days, struggle):
     try:
@@ -81,76 +72,159 @@ def create_pdf(markdown_text):
     os.remove(temp_filename)
     return pdf_bytes
 
-# --- 6. Execution Block (Claude AI) ---
-if st.button("Generate My Sprint Plan 🚀"):
-    if not student_struggle:
-        st.warning("⚠️ Please describe what you are struggling with so I can help!")
-    else:
-        with st.spinner("Analyzing your learning gap with Claude AI..."):
-            log_to_sheets(confidence, days_remaining, student_struggle)
-            
-            try:
-                syllabus_data = "Syllabus not found. Please provide general electromagnetics advice."
-                if os.path.exists("syllabus.txt"):
-                    with open("syllabus.txt", "r", encoding="utf-8") as file:
-                        syllabus_data = file.read()
+# Shared system instruction to ensure Sadiku notation everywhere
+shared_system_instructions = """
+You are an empathetic, expert university professor teaching Electromagnetics Theory (course code ECM420) at UiTM. 
+CRITICAL MATHEMATICAL NOTATION RULES:
+- You MUST adopt the exact mathematical notation used in Matthew N.O. Sadiku's "Elements of Electromagnetics" and the UiTM ECM420 Appendix.
+- DO NOT use standard LaTeX or dollar signs ($ or $$) as it will crash the app's PDF generator.
+- Use Markdown bolding for vectors (e.g., **E**, **D**, **H**, **B**).
+- For unit vectors, DO NOT USE UNDERSCORES. Use bold 'a' followed directly by the coordinate direction (e.g., **a**x, **a**y, **a**z; **a**ρ, **a**φ, **a**z; **a**r, **a**θ, **a**φ).
+- For differential surface area, you MUST use 'dS' (capital S). DO NOT use 'da'.
+- Use rich Unicode for Greek letters and operators (e.g., ∇, ∫, ∂, π, μ₀, ε₀, ∬).
+"""
 
-                # Initialize Anthropic Client
-                client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"])
+# --- 6. TABS INTERFACE ---
+tab1, tab2, tab3 = st.tabs(["🚀 Sprint Plan", "🧠 Feynman Checker", "🌊 Analogy Engine"])
+
+# ==========================================
+# TAB 1: SPRINT PLANNER (Your Original App)
+# ==========================================
+with tab1:
+    st.info("""
+    **👉 HOW TO USE YOUR AI TUTOR:**
+    1. **Set your profile (Left Sidebar):** Adjust your confidence level and days left. 
+    2. **Describe your struggle:** Be specific!
+    3. **Generate:** Click the button below to get your custom sprint schedule.
+    """)
+
+    student_struggle = st.text_area("Having trouble with Electromagnetics Theory? Tell me exactly what is confusing you:", height=100)
+
+    if st.button("Generate My Sprint Plan 🚀"):
+        if not student_struggle:
+            st.warning("⚠️ Please describe what you are struggling with so I can help!")
+        else:
+            with st.spinner("Analyzing your learning gap with Claude AI..."):
+                log_to_sheets(confidence, days_remaining, student_struggle)
                 
-                system_instructions = """
-                You are an empathetic, expert university professor teaching Electromagnetics Theory (course code ECM420) at UiTM. 
-                
-                CRITICAL MATHEMATICAL NOTATION RULES:
-                - You MUST adopt the exact mathematical notation used in Matthew N.O. Sadiku's "Elements of Electromagnetics" and the UiTM ECM420 Appendix.
-                - DO NOT use standard LaTeX or dollar signs ($ or $$) as it will crash the app's PDF generator.
-                - Use Markdown bolding for vectors (e.g., **E**, **D**, **H**, **B**).
-                - For unit vectors, DO NOT USE UNDERSCORES. Use bold 'a' followed directly by the coordinate direction (e.g., **a**x, **a**y, **a**z for Cartesian; **a**ρ, **a**φ, **a**z for Cylindrical; **a**r, **a**θ, **a**φ for Spherical).
-                - For differential surface area, you MUST use 'dS' (capital S). DO NOT use 'da'.
-                - Example of acceptable format: **E** = -10x **a**x - 3 **a**y + 2 **a**z V/m.
-                - Use rich Unicode for Greek letters and operators (e.g., ∇, ∫, ∂, π, μ₀, ε₀, ∬).
-                
-                FORMATTING RULES:
-                - MUST output a study schedule as a Markdown table with exactly 5 columns.
-                - Keep table formatting clean and simple.
-                """
-                
-                user_message = f"""
-                Syllabus:\n{syllabus_data}\n\n
-                Student Confidence: {confidence}\nDays to Assessment: {days_remaining}\nStruggle: "{student_struggle}"\n
-                Provide:
-                1. Brief diagnosis.
-                2. A day-by-day table study schedule over {days_remaining} days.
-                3. A mini-quiz at the end.
-                """
-                
-                # Using the latest active Claude Haiku 4.5 model
-                response = client.messages.create(
-                    model="claude-haiku-4-5-20251001",
-                    max_tokens=2000,
-                    system=system_instructions,
-                    messages=[{"role": "user", "content": user_message}]
-                )
-                
-                response_text = response.content[0].text
-                
-                if response_text:
-                    st.success("Plan Generated Successfully!")
-                    st.markdown(response_text)
-                    st.markdown("---")
+                try:
+                    syllabus_data = "Syllabus not found. Please provide general electromagnetics advice."
+                    if os.path.exists("syllabus.txt"):
+                        with open("syllabus.txt", "r", encoding="utf-8") as file:
+                            syllabus_data = file.read()
+
+                    client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"])
                     
-                    st.subheader("📺 Recommended Dr. Aziati Lecture Materials")
-                    st.write("👉 **Action Required:** Based on your generated study plan above, please click the **Playlist Menu icon (三)** in the top right corner of the video player below. Scroll through and select the exact lecture material that matches your current topic!")
-                    st.video(random.choice(youtube_videos))
-                    st.markdown("---")
+                    user_message = f"""
+                    Syllabus:\n{syllabus_data}\n\n
+                    Student Confidence: {confidence}\nDays to Assessment: {days_remaining}\nStruggle: "{student_struggle}"\n
+                    Provide:
+                    1. Brief diagnosis.
+                    2. A day-by-day table study schedule over {days_remaining} days (exactly 5 columns).
+                    3. A mini-quiz at the end.
+                    """
                     
-                    clean_md = response_text.replace("\n||\n", "\n|---|---|---|---|---|\n").replace("\n| |\n", "\n|---|---|---|---|---|\n")
+                    response = client.messages.create(
+                        model="claude-haiku-4-5-20251001",
+                        max_tokens=2000,
+                        system=shared_system_instructions + "\n- MUST output a study schedule as a Markdown table with exactly 5 columns. Keep it simple.",
+                        messages=[{"role": "user", "content": user_message}]
+                    )
                     
-                    try:
-                        pdf_bytes = create_pdf(clean_md)
-                        st.download_button(label="📥 Download Plan as PDF", data=pdf_bytes, file_name="ECM420_Study_Plan.pdf", mime="application/pdf")
-                    except Exception as pdf_error:
-                         st.error("⚠️ PDF conversion failed, but you can copy the text above.")
-                         
-            except Exception as e:
-                st.error(f"An error occurred: {e}")
+                    response_text = response.content[0].text
+                    
+                    if response_text:
+                        st.success("Plan Generated Successfully!")
+                        st.markdown(response_text)
+                        st.markdown("---")
+                        
+                        st.subheader("📺 Recommended Dr. Aziati Lecture Materials")
+                        st.write("👉 **Action Required:** Based on your generated study plan above, please click the **Playlist Menu icon (三)** in the top right corner of the video player below. Scroll through and select the exact lecture material that matches your current topic!")
+                        st.video(random.choice(youtube_videos))
+                        st.markdown("---")
+                        
+                        clean_md = response_text.replace("\n||\n", "\n|---|---|---|---|---|\n").replace("\n| |\n", "\n|---|---|---|---|---|\n")
+                        
+                        try:
+                            pdf_bytes = create_pdf(clean_md)
+                            st.download_button(label="📥 Download Plan as PDF", data=pdf_bytes, file_name="ECM420_Study_Plan.pdf", mime="application/pdf")
+                        except Exception as pdf_error:
+                             st.error("⚠️ PDF conversion failed, but you can copy the text above.")
+                             
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+
+# ==========================================
+# TAB 2: FEYNMAN CONCEPT CHECKER
+# ==========================================
+with tab2:
+    st.info("💡 **The Feynman Technique:** The best way to learn is to teach. Explain an ECM420 concept in your own words, and I will grade your understanding!")
+    
+    student_explanation = st.text_area("Explain a concept to me (e.g., How does Gauss's Law work? Why do we use cylindrical coordinates?):", height=150)
+    
+    if st.button("Check My Understanding 🧠"):
+        if not student_explanation:
+            st.warning("⚠️ Please type your explanation first!")
+        else:
+            with st.spinner("Reviewing your explanation like a strict but fair professor..."):
+                try:
+                    client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"])
+                    
+                    feynman_prompt = f"""
+                    The student has provided the following explanation of an Electromagnetics concept in their own words:
+                    "{student_explanation}"
+                    
+                    Task:
+                    1. Point out exactly what they got right.
+                    2. Gently correct any misconceptions or technical errors.
+                    3. Give them a 'Comprehension Score' out of 10.
+                    """
+                    
+                    response = client.messages.create(
+                        model="claude-haiku-4-5-20251001",
+                        max_tokens=1000,
+                        system=shared_system_instructions,
+                        messages=[{"role": "user", "content": feynman_prompt}]
+                    )
+                    
+                    st.success("Review Complete!")
+                    st.markdown(response.content[0].text)
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+
+# ==========================================
+# TAB 3: REAL-WORLD ANALOGY ENGINE
+# ==========================================
+with tab3:
+    st.info("🌊 **Invisible Forces Made Real:** Electromagnetics is notoriously abstract. Tell me what formula or concept you are stuck on, and I will explain it using a real-world physical analogy.")
+    
+    analogy_topic = st.text_input("What concept is confusing you? (e.g., Divergence, Magnetic Flux, Biot-Savart Law)")
+    
+    if st.button("Give Me an Analogy 🌍"):
+        if not analogy_topic:
+            st.warning("⚠️ Please enter a topic!")
+        else:
+            with st.spinner("Brewing up a real-world analogy..."):
+                try:
+                    client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"])
+                    
+                    analogy_prompt = f"""
+                    The student is struggling to intuitively understand this concept: "{analogy_topic}".
+                    
+                    Task:
+                    1. Explain this concept using a highly vivid, real-world physical analogy (like water flowing through pipes, traffic, wind, rubber bands, etc.).
+                    2. Map the variables of the concept directly to the analogy (e.g., "The water pressure represents voltage V, the pipe width represents resistance...").
+                    3. Keep it encouraging and easy to visualize.
+                    """
+                    
+                    response = client.messages.create(
+                        model="claude-haiku-4-5-20251001",
+                        max_tokens=1000,
+                        system=shared_system_instructions,
+                        messages=[{"role": "user", "content": analogy_prompt}]
+                    )
+                    
+                    st.success("Analogy Generated!")
+                    st.markdown(response.content[0].text)
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
