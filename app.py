@@ -4,6 +4,8 @@ import os
 import json
 import gspread
 import random
+import pandas as pd
+import plotly.express as px
 from google.oauth2.service_account import Credentials
 from datetime import datetime
 from markdown_pdf import MarkdownPdf, Section
@@ -61,17 +63,18 @@ Electromagnetics Theory can be tough, but you don't have to study alone. I am he
 """)
 
 # --- 5. Helper Functions ---
-# UPDATED: Now accepts 'tool_used' as a parameter to track which tab they clicked!
+def get_gspread_client():
+    creds_dict = json.loads(st.secrets["GOOGLE_CREDENTIALS_JSON"])
+    scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+    return gspread.authorize(creds)
+
 def log_to_sheets(conf_level, days, tool_used, student_input):
     try:
         if "GOOGLE_CREDENTIALS_JSON" in st.secrets:
-            creds_dict = json.loads(st.secrets["GOOGLE_CREDENTIALS_JSON"])
-            scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-            creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
-            client = gspread.authorize(creds)
+            client = get_gspread_client()
             sheet = client.open("ECM420_Database").sheet1
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            # Appends 5 columns to your Google Sheet
             sheet.append_row([current_time, conf_level, days, tool_used, student_input])
     except Exception as e:
         print(f"Database Logging Error: {e}")
@@ -99,24 +102,20 @@ CRITICAL MATHEMATICAL NOTATION RULES:
 """
 
 # --- 6. TABS INTERFACE ---
-tab1, tab2, tab3 = st.tabs(["🚀 Sprint Plan", "🧠 Feynman Checker", "🌊 Analogy Engine"])
+tab1, tab2, tab3, tab4 = st.tabs(["🚀 Sprint Plan", "🧠 Feynman Checker", "🌊 Analogy Engine", "🔒 Instructor Admin"])
 
 # ==========================================
 # TAB 1: SPRINT PLANNER 
 # ==========================================
 with tab1:
-    st.info("**Tool 1: Sprint Plan** - Tell me what topic you are struggling with, and I will generate a custom, day-by-day study schedule aligned with your remaining days.")
-
+    st.info("**Tool 1: Sprint Plan** - Tell me what topic you are struggling with, and I will generate a custom study schedule.")
     student_struggle = st.text_area("Having trouble with Electromagnetics Theory? Tell me exactly what is confusing you:", height=100)
-
     if st.button("Generate My Sprint Plan 🚀"):
         if not student_struggle:
             st.warning("⚠️ Please describe what you are struggling with so I can help!")
         else:
             with st.spinner("Analyzing your learning gap with Claude AI..."):
-                # LOGGING: Tags as "Sprint Plan"
                 log_to_sheets(confidence, days_remaining, "Sprint Plan", student_struggle)
-                
                 try:
                     syllabus_data = "Syllabus not found. Please provide general electromagnetics advice."
                     if os.path.exists("syllabus.txt"):
@@ -124,15 +123,7 @@ with tab1:
                             syllabus_data = file.read()
 
                     client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"])
-                    
-                    user_message = f"""
-                    Syllabus:\n{syllabus_data}\n\n
-                    Student Confidence: {confidence}\nDays to Assessment: {days_remaining}\nStruggle: "{student_struggle}"\n
-                    Provide:
-                    1. Brief diagnosis.
-                    2. A day-by-day table study schedule over {days_remaining} days (exactly 5 columns).
-                    3. A mini-quiz at the end.
-                    """
+                    user_message = f"Syllabus:\n{syllabus_data}\n\nStudent Confidence: {confidence}\nDays to Assessment: {days_remaining}\nStruggle: \"{student_struggle}\"\nProvide:\n1. Brief diagnosis.\n2. A day-by-day table study schedule over {days_remaining} days (exactly 5 columns).\n3. A mini-quiz at the end."
                     
                     response = client.messages.create(
                         model="claude-haiku-4-5-20251001",
@@ -142,25 +133,21 @@ with tab1:
                     )
                     
                     response_text = response.content[0].text
-                    
                     if response_text:
                         st.success("Plan Generated Successfully!")
                         st.markdown(response_text)
                         st.markdown("---")
-                        
                         st.subheader("📺 Recommended Dr. Aziati Lecture Materials")
                         st.write("👉 **Action Required:** Based on your generated study plan above, please click the **Playlist Menu icon (三)** in the top right corner of the video player below. Scroll through and select the exact lecture material that matches your current topic!")
                         st.video(random.choice(youtube_videos))
                         st.markdown("---")
                         
                         clean_md = response_text.replace("\n||\n", "\n|---|---|---|---|---|\n").replace("\n| |\n", "\n|---|---|---|---|---|\n")
-                        
                         try:
                             pdf_bytes = create_pdf(clean_md)
                             st.download_button(label="📥 Download Plan as PDF", data=pdf_bytes, file_name="ECM420_Study_Plan.pdf", mime="application/pdf")
                         except Exception as pdf_error:
                              st.error("⚠️ PDF conversion failed, but you can copy the text above.")
-                             
                 except Exception as e:
                     st.error(f"An error occurred: {e}")
 
@@ -168,30 +155,17 @@ with tab1:
 # TAB 2: FEYNMAN CONCEPT CHECKER
 # ==========================================
 with tab2:
-    st.info("**Tool 2: Feynman Checker** - The best way to learn is to teach. Explain an ECM420 concept in your own words below, and I will grade your understanding like a professor!")
-    
-    student_explanation = st.text_area("Explain a concept to me (e.g., How does Gauss's Law work? Why do we use cylindrical coordinates?):", height=150)
-    
+    st.info("**Tool 2: Feynman Checker** - Explain an ECM420 concept in your own words below, and I will grade your understanding!")
+    student_explanation = st.text_area("Explain a concept to me (e.g., How does Gauss's Law work?):", height=150)
     if st.button("Check My Understanding 🧠"):
         if not student_explanation:
             st.warning("⚠️ Please type your explanation first!")
         else:
             with st.spinner("Reviewing your explanation like a strict but fair professor..."):
-                # LOGGING: Tags as "Feynman Checker"
                 log_to_sheets(confidence, days_remaining, "Feynman Checker", student_explanation)
-                
                 try:
                     client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"])
-                    
-                    feynman_prompt = f"""
-                    The student has provided the following explanation of an Electromagnetics concept in their own words:
-                    "{student_explanation}"
-                    
-                    Task:
-                    1. Point out exactly what they got right.
-                    2. Gently correct any misconceptions or technical errors.
-                    3. Give them a 'Comprehension Score' out of 10.
-                    """
+                    feynman_prompt = f"The student has provided the following explanation of an Electromagnetics concept:\n\"{student_explanation}\"\nTask:\n1. Point out exactly what they got right.\n2. Gently correct any misconceptions.\n3. Give them a 'Comprehension Score' out of 10."
                     
                     response = client.messages.create(
                         model="claude-haiku-4-5-20251001",
@@ -199,7 +173,6 @@ with tab2:
                         system=shared_system_instructions,
                         messages=[{"role": "user", "content": feynman_prompt}]
                     )
-                    
                     st.success("Review Complete!")
                     st.markdown(response.content[0].text)
                 except Exception as e:
@@ -209,29 +182,17 @@ with tab2:
 # TAB 3: REAL-WORLD ANALOGY ENGINE
 # ==========================================
 with tab3:
-    st.info("**Tool 3: Analogy Engine** - Invisible forces are notoriously abstract. Tell me what formula or concept you are stuck on, and I will explain it using a real-world physical analogy.")
-    
-    analogy_topic = st.text_input("What concept is confusing you? (e.g., Divergence, Magnetic Flux, Biot-Savart Law)")
-    
+    st.info("**Tool 3: Analogy Engine** - Tell me what formula or concept you are stuck on, and I will explain it using a real-world physical analogy.")
+    analogy_topic = st.text_input("What concept is confusing you? (e.g., Divergence, Magnetic Flux)")
     if st.button("Give Me an Analogy 🌍"):
         if not analogy_topic:
             st.warning("⚠️ Please enter a topic!")
         else:
             with st.spinner("Brewing up a real-world analogy..."):
-                # LOGGING: Tags as "Analogy Engine"
                 log_to_sheets(confidence, days_remaining, "Analogy Engine", analogy_topic)
-                
                 try:
                     client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"])
-                    
-                    analogy_prompt = f"""
-                    The student is struggling to intuitively understand this concept: "{analogy_topic}".
-                    
-                    Task:
-                    1. Explain this concept using a highly vivid, real-world physical analogy (like water flowing through pipes, traffic, wind, rubber bands, etc.).
-                    2. Map the variables of the concept directly to the analogy (e.g., "The water pressure represents voltage V, the pipe width represents resistance...").
-                    3. Keep it encouraging and easy to visualize.
-                    """
+                    analogy_prompt = f"The student is struggling to intuitively understand this concept: \"{analogy_topic}\".\nTask:\n1. Explain this using a highly vivid, real-world physical analogy.\n2. Map the variables directly to the analogy.\n3. Keep it encouraging."
                     
                     response = client.messages.create(
                         model="claude-haiku-4-5-20251001",
@@ -239,8 +200,89 @@ with tab3:
                         system=shared_system_instructions,
                         messages=[{"role": "user", "content": analogy_prompt}]
                     )
-                    
                     st.success("Analogy Generated!")
                     st.markdown(response.content[0].text)
                 except Exception as e:
                     st.error(f"An error occurred: {e}")
+
+# ==========================================
+# TAB 4: INSTRUCTOR ADMIN DASHBOARD
+# ==========================================
+with tab4:
+    st.markdown("### 🔒 Instructor Analytics Dashboard")
+    st.write("Enter the admin password to view real-time class analytics.")
+    
+    # We use st.secrets.get() as a safeguard in case the secret hasn't fully loaded yet
+    admin_password = st.text_input("Password", type="password")
+    correct_password = st.secrets.get("ADMIN_PASSWORD", "default_fallback_password")
+
+    if st.button("Login"):
+        if admin_password == correct_password:
+            st.session_state["admin_logged_in"] = True
+            st.rerun()
+        else:
+            st.error("❌ Incorrect Password")
+
+    # If logged in successfully, show the dashboard
+    if st.session_state.get("admin_logged_in", False):
+        st.success("✅ Logged in successfully!")
+        
+        if st.button("Refresh Data 🔄"):
+            st.rerun()
+
+        st.markdown("---")
+        with st.spinner("Fetching live data from Google Sheets..."):
+            try:
+                # Fetch data directly from the spreadsheet
+                client = get_gspread_client()
+                sheet = client.open("ECM420_Database").sheet1
+                data = sheet.get_all_records()
+                
+                if not data:
+                    st.info("No data has been logged yet. Tell your students to start using the app!")
+                else:
+                    # Convert to Pandas DataFrame for easy analysis
+                    df = pd.DataFrame(data)
+                    
+                    # Ensure we have the right columns
+                    if 'Confidence Level' in df.columns and 'Tool Used' in df.columns:
+                        
+                        # --- Metrics Row ---
+                        colA, colB = st.columns(2)
+                        with colA:
+                            st.metric(label="Total Interactions Logged", value=len(df))
+                        with colB:
+                            avg_conf = df['Confidence Level'].mean()
+                            st.metric(label="Average Class Confidence", value=f"{avg_conf:.1f} / 10")
+                        
+                        st.markdown("---")
+                        
+                        # --- Charts Row ---
+                        colC, colD = st.columns(2)
+                        
+                        with colC:
+                            st.markdown("**🛠️ Most Popular Learning Tools**")
+                            tool_counts = df['Tool Used'].value_counts().reset_index()
+                            tool_counts.columns = ['Tool Used', 'Count']
+                            fig_pie = px.pie(tool_counts, values='Count', names='Tool Used', hole=0.3)
+                            st.plotly_chart(fig_pie, use_container_width=True)
+
+                        with colD:
+                            st.markdown("**📊 Student Confidence Distribution**")
+                            fig_bar = px.histogram(df, x='Confidence Level', nbins=10, 
+                                                   labels={'Confidence Level': 'Confidence (1-10)'},
+                                                   color_discrete_sequence=['#2E7D32'])
+                            st.plotly_chart(fig_bar, use_container_width=True)
+
+                        st.markdown("---")
+                        
+                        # --- Raw Data Table ---
+                        st.markdown("**📝 Raw Student Inputs (What they are struggling with)**")
+                        # Displaying only the relevant columns to read
+                        if 'Student Input' in df.columns:
+                            st.dataframe(df[['Timestamp', 'Tool Used', 'Student Input', 'Confidence Level']], use_container_width=True)
+                        else:
+                            st.dataframe(df, use_container_width=True)
+                            
+            except Exception as e:
+                st.error(f"⚠️ Error fetching data: {e}")
