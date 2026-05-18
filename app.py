@@ -1,3 +1,4 @@
+# --- START OF CODE ---
 import streamlit as st
 import anthropic
 import os
@@ -191,4 +192,61 @@ with tab4:
         st.markdown("---")
         with st.spinner("Fetching live data from Google Sheets..."):
             try:
-                client = get_gspread
+                client = get_gspread_client()
+                sheet = client.open("ECM420_Database").sheet1
+                data = sheet.get_all_records()
+                if not data:
+                    st.info("No data has been logged yet. Tell your students to start using the app!")
+                else:
+                    df = pd.DataFrame(data)
+                    df.columns = df.columns.astype(str).str.strip()
+                    if 'Confidence Level' in df.columns:
+                        df['Confidence Level'] = pd.to_numeric(df['Confidence Level'], errors='coerce')
+                    if 'Confidence Level' in df.columns and 'Tool Used' in df.columns:
+                        colA, colB = st.columns(2)
+                        with colA:
+                            st.metric(label="Total Interactions Logged", value=len(df))
+                        with colB:
+                            avg_conf = df['Confidence Level'].mean()
+                            st.metric(label="Average Class Confidence", value=f"{avg_conf:.1f} / 10")
+                        st.markdown("---")
+                        colC, colD = st.columns(2)
+                        with colC:
+                            st.markdown("**🛠️ Most Popular Learning Tools**")
+                            tool_counts = df['Tool Used'].value_counts().reset_index()
+                            tool_counts.columns = ['Tool Used', 'Count']
+                            fig_pie = px.pie(tool_counts, values='Count', names='Tool Used', hole=0.3)
+                            st.plotly_chart(fig_pie, use_container_width=True)
+                        with colD:
+                            st.markdown("**📊 Student Confidence Distribution**")
+                            fig_bar = px.histogram(df, x='Confidence Level', nbins=10, labels={'Confidence Level': 'Confidence (1-10)'}, color_discrete_sequence=['#2E7D32'])
+                            st.plotly_chart(fig_bar, use_container_width=True)
+                        st.markdown("---")
+                        st.markdown("**☁️ Student Struggles Word Cloud**")
+                        st.write("The larger the word, the more frequently students are asking about it!")
+                        if 'Student Input' in df.columns:
+                            text_data = " ".join(df['Student Input'].dropna().astype(str).tolist())
+                            if text_data.strip():
+                                wordcloud = WordCloud(width=800, height=400, background_color='white', colormap='Greens').generate(text_data)
+                                fig_wc, ax = plt.subplots(figsize=(10, 5))
+                                ax.imshow(wordcloud, interpolation='bilinear')
+                                ax.axis('off')
+                                st.pyplot(fig_wc)
+                            else:
+                                st.info("Not enough text data to generate a word cloud yet.")
+                        else:
+                            st.warning("⚠️ Could not generate Word Cloud: Missing 'Student Input' column.")
+                        st.markdown("---")
+                        st.markdown("**📝 Raw Student Inputs**")
+                        desired_cols = ['Timestamp', 'Tool Used', 'Student Input', 'Confidence Level']
+                        available_cols = [col for col in desired_cols if col in df.columns]
+                        if available_cols:
+                            st.dataframe(df[available_cols], use_container_width=True)
+                        else:
+                            st.dataframe(df, use_container_width=True)
+            except Exception as e:
+                st.error(f"⚠️ Error fetching data: {e}")
+
+st.markdown("---")
+st.markdown("<div style='text-align: center; color: gray; font-size: 14px;'>© 2026 Aziati Husna Awang. All rights reserved.</div>", unsafe_allow_html=True)
+# --- END OF CODE ---
