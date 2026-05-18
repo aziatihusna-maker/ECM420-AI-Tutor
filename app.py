@@ -126,7 +126,6 @@ with tab1:
 
                     client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"])
                     
-                    # Using triple quotes here to prevent line-break errors
                     user_message = f"""Syllabus:
 {syllabus_data}
 
@@ -141,7 +140,7 @@ Provide:
                     response = client.messages.create(
                         model="claude-haiku-4-5-20251001",
                         max_tokens=2000,
-                        system=shared_system_instructions + "\n- MUST output a study schedule as a Markdown table with exactly 5 columns. Keep it simple.",
+                        system=shared_system_instructions + "\n- MUST output a Markdown table with exactly 5 columns.",
                         messages=[{"role": "user", "content": user_message}]
                     )
                     
@@ -158,4 +157,74 @@ Provide:
                         clean_md = response_text.replace("\n||\n", "\n|---|---|---|---|---|\n").replace("\n| |\n", "\n|---|---|---|---|---|\n")
                         try:
                             pdf_bytes = create_pdf(clean_md)
-                            st.download_button(label="📥 Download Plan as PDF", data=pdf_bytes, file_name="ECM420_Study_Plan.
+                            # SAFELY STACKED DOWNLOAD BUTTON
+                            st.download_button(
+                                label="📥 Download Plan as PDF", 
+                                data=pdf_bytes, 
+                                file_name="ECM420_Study_Plan.pdf", 
+                                mime="application/pdf"
+                            )
+                        except Exception as pdf_error:
+                             st.error("⚠️ PDF conversion failed, but you can copy the text above.")
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+
+# ==========================================
+# TAB 2: FEYNMAN CONCEPT CHECKER
+# ==========================================
+with tab2:
+    st.info("**Tool 2: Feynman Checker** - Explain an ECM420 concept in your own words below, and I will grade your understanding!")
+    student_explanation = st.text_area("Explain a concept to me (e.g., How does Gauss's Law work?):", height=150)
+    if st.button("Check My Understanding 🧠"):
+        if not student_explanation:
+            st.warning("⚠️ Please type your explanation first!")
+        else:
+            with st.spinner("Reviewing your explanation like a strict but fair professor..."):
+                log_to_sheets(confidence, days_remaining, "Feynman Checker", student_explanation)
+                try:
+                    client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"])
+                    
+                    feynman_prompt = f"""The student has provided the following explanation of an Electromagnetics concept:
+"{student_explanation}"
+Task:
+1. Point out exactly what they got right.
+2. Gently correct any misconceptions.
+3. Give them a 'Comprehension Score' out of 10."""
+                    
+                    response = client.messages.create(
+                        model="claude-haiku-4-5-20251001",
+                        max_tokens=1000,
+                        system=shared_system_instructions,
+                        messages=[{"role": "user", "content": feynman_prompt}]
+                    )
+                    st.success("Review Complete!")
+                    st.markdown(response.content[0].text)
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+
+# ==========================================
+# TAB 3: REAL-WORLD ANALOGY ENGINE
+# ==========================================
+with tab3:
+    st.info("**Tool 3: Analogy Engine** - Tell me what formula or concept you are stuck on, and I will explain it using a real-world physical analogy.")
+    analogy_topic = st.text_input("What concept is confusing you? (e.g., Divergence, Magnetic Flux)")
+    if st.button("Give Me an Analogy 🌍"):
+        if not analogy_topic:
+            st.warning("⚠️ Please enter a topic!")
+        else:
+            with st.spinner("Brewing up a real-world analogy..."):
+                log_to_sheets(confidence, days_remaining, "Analogy Engine", analogy_topic)
+                try:
+                    client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"])
+                    
+                    analogy_prompt = f"""The student is struggling to intuitively understand this concept: "{analogy_topic}".
+Task:
+1. Explain this using a highly vivid, real-world physical analogy.
+2. Map the variables directly to the analogy.
+3. Keep it encouraging."""
+                    
+                    response = client.messages.create(
+                        model="claude-haiku-4-5-20251001",
+                        max_tokens=1000,
+                        system=shared_system_instructions,
+                        messages=[{"role": "user", "
