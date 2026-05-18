@@ -61,7 +61,13 @@ def log_to_sheets(conf_level, days, tool_used, student_input):
             client = get_gspread_client()
             sheet = client.open("ECM420_Database").sheet1
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            sheet.append_row([current_time, conf_level, days, tool_used, student_input])
+            
+            # --- THE FIX: Forcing Google Sheets to physically insert a row! ---
+            sheet.append_row(
+                [current_time, conf_level, days, tool_used, student_input],
+                value_input_option="USER_ENTERED",
+                insert_data_option="INSERT_ROWS"
+            )
     except Exception as e:
         print(f"Database Logging Error: {e}")
 
