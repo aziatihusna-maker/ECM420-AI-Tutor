@@ -334,25 +334,4 @@ with tab4:
                                 ).generate(text_data)
                                 
                                 fig_wc, ax = plt.subplots(figsize=(10, 5))
-                                ax.imshow(wordcloud, interpolation='bilinear')
-                                ax.axis('off')
-                                st.pyplot(fig_wc)
-                            else:
-                                st.info("Not enough text data to generate a word cloud yet.")
-                        else:
-                            st.warning("⚠️ Could not generate Word Cloud: Missing 'Student Input' column.")
-                        
-                        st.markdown("---")
-
-                        st.markdown("**📝 Raw Student Inputs**")
-                        
-                        desired_cols = ['Timestamp', 'Tool Used', 'Student Input', 'Confidence Level']
-                        available_cols = [col for col in desired_cols if col in df.columns]
-                        
-                        if available_cols:
-                            st.dataframe(df[available_cols], use_container_width=True)
-                        else:
-                            st.dataframe(df, use_container_width=True)
-                            
-            except Exception as e:
-                st.error(f"⚠️ Error fetching data: {e}")
+                                ax
