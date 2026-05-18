@@ -137,7 +137,222 @@ Provide:
 2. A day-by-day table study schedule over {days_remaining} days (exactly 5 columns).
 3. A mini-quiz at the end."""
                     
-                    # BITE-SIZED FIX: Break the message array out
                     api_messages = [{"role": "user", "content": user_message}]
                     
-                    response = client.messages.create
+                    response = client.messages.create(
+                        model="claude-haiku-4-5-20251001",
+                        max_tokens=2000,
+                        system=shared_system_instructions + "\n- MUST output a Markdown table with exactly 5 columns.",
+                        messages=api_messages
+                    )
+                    
+                    response_text = response.content[0].text
+                    if response_text:
+                        st.success("Plan Generated Successfully!")
+                        st.markdown(response_text)
+                        st.markdown("---")
+                        st.subheader("📺 Recommended Dr. Aziati Lecture Materials")
+                        st.write("👉 **Action Required:** Based on your generated study plan above, please click the **Playlist Menu icon (三)** in the top right corner of the video player below. Scroll through and select the exact lecture material that matches your current topic!")
+                        st.video(random.choice(youtube_videos))
+                        st.markdown("---")
+                        
+                        clean_md = response_text.replace("\n||\n", "\n|---|---|---|---|---|\n").replace("\n| |\n", "\n|---|---|---|---|---|\n")
+                        try:
+                            pdf_bytes = create_pdf(clean_md)
+                            st.download_button(
+                                label="📥 Download Plan as PDF", 
+                                data=pdf_bytes, 
+                                file_name="ECM420_Study_Plan.pdf", 
+                                mime="application/pdf"
+                            )
+                        except Exception as pdf_error:
+                             st.error("⚠️ PDF conversion failed, but you can copy the text above.")
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+
+# ==========================================
+# TAB 2: FEYNMAN CONCEPT CHECKER
+# ==========================================
+with tab2:
+    st.info("**Tool 2: Feynman Checker** - Explain an ECM420 concept in your own words below, and I will grade your understanding!")
+    student_explanation = st.text_area("Explain a concept to me (e.g., How does Gauss's Law work?):", height=150)
+    if st.button("Check My Understanding 🧠"):
+        if not student_explanation:
+            st.warning("⚠️ Please type your explanation first!")
+        else:
+            with st.spinner("Reviewing your explanation like a strict but fair professor..."):
+                log_to_sheets(confidence, days_remaining, "Feynman Checker", student_explanation)
+                try:
+                    client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"])
+                    
+                    feynman_prompt = f"""The student has provided the following explanation of an Electromagnetics concept:
+"{student_explanation}"
+Task:
+1. Point out exactly what they got right.
+2. Gently correct any misconceptions.
+3. Give them a 'Comprehension Score' out of 10."""
+                    
+                    api_messages = [{"role": "user", "content": feynman_prompt}]
+                    
+                    response = client.messages.create(
+                        model="claude-haiku-4-5-20251001",
+                        max_tokens=1000,
+                        system=shared_system_instructions,
+                        messages=api_messages
+                    )
+                    st.success("Review Complete!")
+                    st.markdown(response.content[0].text)
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+
+# ==========================================
+# TAB 3: REAL-WORLD ANALOGY ENGINE
+# ==========================================
+with tab3:
+    st.info("**Tool 3: Analogy Engine** - Tell me what formula or concept you are stuck on, and I will explain it using a real-world physical analogy.")
+    analogy_topic = st.text_input("What concept is confusing you? (e.g., Divergence, Magnetic Flux)")
+    if st.button("Give Me an Analogy 🌍"):
+        if not analogy_topic:
+            st.warning("⚠️ Please enter a topic!")
+        else:
+            with st.spinner("Brewing up a real-world analogy..."):
+                log_to_sheets(confidence, days_remaining, "Analogy Engine", analogy_topic)
+                try:
+                    client = anthropic.Anthropic(api_key=st.secrets["CLAUDE_API_KEY"])
+                    
+                    analogy_prompt = f"""The student is struggling to intuitively understand this concept: "{analogy_topic}".
+Task:
+1. Explain this using a highly vivid, real-world physical analogy.
+2. Map the variables directly to the analogy.
+3. Keep it encouraging."""
+                    
+                    api_messages = [{"role": "user", "content": analogy_prompt}]
+                    
+                    response = client.messages.create(
+                        model="claude-haiku-4-5-20251001",
+                        max_tokens=1000,
+                        system=shared_system_instructions,
+                        messages=api_messages
+                    )
+                    st.success("Analogy Generated!")
+                    st.markdown(response.content[0].text)
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+
+# ==========================================
+# TAB 4: INSTRUCTOR ADMIN DASHBOARD
+# ==========================================
+with tab4:
+    st.markdown("### 🔒 Instructor Analytics Dashboard")
+    st.write("Enter the admin password to view real-time class analytics.")
+    
+    admin_password = st.text_input("Password", type="password")
+    correct_password = st.secrets.get("ADMIN_PASSWORD", "default_fallback_password")
+
+    if st.button("Login"):
+        if admin_password == correct_password:
+            st.session_state["admin_logged_in"] = True
+            st.rerun()
+        else:
+            st.error("❌ Incorrect Password")
+
+    if st.session_state.get("admin_logged_in", False):
+        st.success("✅ Logged in successfully!")
+        
+        if st.button("Refresh Data 🔄"):
+            st.rerun()
+
+        st.markdown("---")
+        with st.spinner("Fetching live data from Google Sheets..."):
+            try:
+                client = get_gspread_client()
+                sheet = client.open("ECM420_Database").sheet1
+                data = sheet.get_all_records()
+                
+                if not data:
+                    st.info("No data has been logged yet. Tell your students to start using the app!")
+                else:
+                    df = pd.DataFrame(data)
+                    
+                    df.columns = df.columns.astype(str).str.strip()
+                    
+                    if 'Confidence Level' in df.columns:
+                        df['Confidence Level'] = pd.to_numeric(df['Confidence Level'], errors='coerce')
+                    
+                    if 'Confidence Level' in df.columns and 'Tool Used' in df.columns:
+                        
+                        colA, colB = st.columns(2)
+                        with colA:
+                            st.metric(label="Total Interactions Logged", value=len(df))
+                        with colB:
+                            avg_conf = df['Confidence Level'].mean()
+                            st.metric(label="Average Class Confidence", value=f"{avg_conf:.1f} / 10")
+                        
+                        st.markdown("---")
+                        
+                        colC, colD = st.columns(2)
+                        
+                        with colC:
+                            st.markdown("**🛠️ Most Popular Learning Tools**")
+                            tool_counts = df['Tool Used'].value_counts().reset_index()
+                            tool_counts.columns = ['Tool Used', 'Count']
+                            
+                            fig_pie = px.pie(
+                                tool_counts, 
+                                values='Count', 
+                                names='Tool Used', 
+                                hole=0.3
+                            )
+                            st.plotly_chart(fig_pie, use_container_width=True)
+
+                        with colD:
+                            st.markdown("**📊 Student Confidence Distribution**")
+                            
+                            fig_bar = px.histogram(
+                                df, 
+                                x='Confidence Level', 
+                                nbins=10, 
+                                labels={'Confidence Level': 'Confidence (1-10)'},
+                                color_discrete_sequence=['#2E7D32']
+                            )
+                            st.plotly_chart(fig_bar, use_container_width=True)
+
+                        st.markdown("---")
+                        
+                        st.markdown("**☁️ Student Struggles Word Cloud**")
+                        st.write("The larger the word, the more frequently students are asking about it!")
+                        
+                        if 'Student Input' in df.columns:
+                            text_data = " ".join(df['Student Input'].dropna().astype(str).tolist())
+                            
+                            if text_data.strip():
+                                wordcloud = WordCloud(
+                                    width=800, 
+                                    height=400, 
+                                    background_color='white', 
+                                    colormap='Greens'
+                                ).generate(text_data)
+                                
+                                fig_wc, ax = plt.subplots(figsize=(10, 5))
+                                ax.imshow(wordcloud, interpolation='bilinear')
+                                ax.axis('off')
+                                st.pyplot(fig_wc)
+                            else:
+                                st.info("Not enough text data to generate a word cloud yet.")
+                        else:
+                            st.warning("⚠️ Could not generate Word Cloud: Missing 'Student Input' column.")
+                        
+                        st.markdown("---")
+
+                        st.markdown("**📝 Raw Student Inputs**")
+                        
+                        desired_cols = ['Timestamp', 'Tool Used', 'Student Input', 'Confidence Level']
+                        available_cols = [col for col in desired_cols if col in df.columns]
+                        
+                        if available_cols:
+                            st.dataframe(df[available_cols], use_container_width=True)
+                        else:
+                            st.dataframe(df, use_container_width=True)
+                            
+            except Exception as e:
+                st.error(f"⚠️ Error fetching data: {e}")
