@@ -5,3 +5,5 @@ markdown-pdf
 anthropic
 pandas
 plotly
+wordcloud
+matplotlib
