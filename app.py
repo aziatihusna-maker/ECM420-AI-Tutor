@@ -54,7 +54,7 @@ st.info("""
 3. **Generate:** Click the button below to get your custom sprint schedule.
 """)
 
-student_struggle = text_area_input = st.text_area("Having trouble with Electromagnetics Theory? Tell me exactly what is confusing you:", height=150)
+student_struggle = st.text_area("Having trouble with Electromagnetics Theory? Tell me exactly what is confusing you:", height=150)
 
 # --- 5. Helper Functions ---
 def log_to_sheets(conf_level, days, struggle):
@@ -100,10 +100,18 @@ if st.button("Generate My Sprint Plan 🚀"):
                 
                 system_instructions = """
                 You are an empathetic, expert university professor teaching Electromagnetics Theory (course code ECM420) at UiTM. 
-                CRITICAL RULES:
-                - NO LaTeX, MathJax, or dollar signs ($ or $$). Write out Greek letters (e.g., epsilon, mu).
-                - MUST output a Markdown table with exactly 5 columns.
-                - Keep formatting simple so the PDF engine does not crash.
+                
+                CRITICAL MATHEMATICAL NOTATION RULES:
+                - You MUST adopt the exact mathematical notation used in Matthew N.O. Sadiku's "Elements of Electromagnetics".
+                - DO NOT use standard LaTeX or dollar signs ($ or $$) as it will crash the app's PDF generator.
+                - Use Markdown bolding for vectors (e.g., **E**, **D**, **H**, **B**).
+                - For unit vectors, use bold 'a' with standard text or Unicode for the coordinate direction instead of i, j, k (e.g., **a**_x, **a**_y, **a**_z for Cartesian; **a**_ρ, **a**_φ, **a**_z for Cylindrical; **a**_r, **a**_θ, **a**_φ for Spherical).
+                - Example of acceptable format: **E** = -10x **a**_x - 3 **a**_y + 2 **a**_z V/m.
+                - Use rich Unicode for Greek letters and operators (e.g., ∇, ∫, ∂, π, μ₀, ε₀, ∬).
+                
+                FORMATTING RULES:
+                - MUST output a study schedule as a Markdown table with exactly 5 columns.
+                - Keep table formatting clean and simple.
                 """
                 
                 user_message = f"""
@@ -115,6 +123,7 @@ if st.button("Generate My Sprint Plan 🚀"):
                 3. A mini-quiz at the end.
                 """
                 
+                # Updated to the latest active Claude Haiku 4.5 model
                 response = client.messages.create(
                     model="claude-haiku-4-5-20251001",
                     max_tokens=2000,
@@ -129,7 +138,9 @@ if st.button("Generate My Sprint Plan 🚀"):
                     st.markdown(response_text)
                     st.markdown("---")
                     
-                    st.subheader("📺 Recommended Dr. Aziati Lecture")
+                    # Updated YouTube instructions for playlist navigation
+                    st.subheader("📺 Recommended Dr. Aziati Lecture Materials")
+                    st.write("👉 **Action Required:** Based on your generated study plan above, please click the **Playlist Menu icon (三)** in the top right corner of the video player below. Scroll through and select the exact lecture material that matches your current topic!")
                     st.video(random.choice(youtube_videos))
                     st.markdown("---")
                     
